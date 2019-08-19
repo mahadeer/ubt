@@ -1,0 +1,35 @@
+<project default="run" basedir="ubs">
+    <loadproperty file="../properties.xml" />
+    <target name="run">
+        <property name="authorfile" value="sample"/>
+        <property name="license_text" type="file" value="../build.txt" />
+        <echo>Hello World by UBS Tools by ${authorname}</echo>
+        <perform operation="create" path="bin/${authorname}" />
+        <perform operation="create" path="del/texts" />
+        <perform operation="create" type="file" path="del/texts/sample.txt">
+            Some sample text
+        </perform>
+        <perform operation="create" type="file" path="del/texts/sample.ini">
+            <![CDATA[
+                characters with markup
+            ]]>
+        </perform>
+        <perform operation="create" type="file" path="bin/${authorname}/${authorfile}.txt">
+            Written by the ${authorname}
+            ${license_text}
+        </perform>
+        <perform operation="delete" type="fileset" path="del">
+            <fileset type="excludes" path="**/texts/*.ini" />
+        </perform>
+        <perform operation="delete" path="del" />
+        <perform operation="create" path="sample1" />
+        <perform operation="create" path="sample2" />
+        <perform operation="create" type="file" path="sample1/${authorname}.txt">
+            Written by the ${authorname}
+            ${license_text}
+        </perform>
+        <perform operation="move" from="bin/${authorname}" to="sample2" />
+        <perform operation="copy" from="sample1" to="sample2" />
+        <perform operation="copy" type="file" from="sample2/${authorname}/${authorfile}.txt" to="sample1/${authorfile}.txt" />
+    </target>
+</project>

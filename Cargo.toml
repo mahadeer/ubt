@@ -1,0 +1,11 @@
+[package]
+name = "ubs"
+version = "0.1.0"
+authors = ["mahadeer13 <mahadeer2010@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+roxmltree = "0.6.1"
+regex = "1"
+fs_extra = "1.1.0"
+glob = "0.3.0"

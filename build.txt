@@ -1,0 +1,8 @@
+Some random string from the text file
+To do:
+    * Refactor as modules
+        * Task as module - Completed
+        * Logging module - Completed
+    * Copy, Move - Completed (without fileset)
+    * Exec - Completed
+    * Depends

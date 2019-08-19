@@ -1,0 +1,1191 @@
+<project name="contributionGen" default="main" xmlns:if="ant:if"
+	 xmlns:unless="ant:unless">
+	<property file="config/project.properties" />
+	<property file="config/contribGenerator.properties" />
+	<property file="config/log.properties" />
+	<property file="componentsList.ptxt"/>
+	<target name="main" depends="render,-xmlmain,-ztlmain,-guidemain,-compmain,-tocmain,-xsltmain,-ztlxlsmain,bundle"/>
+	<target name="bundle" >
+	<property name="buildC" value="\.." />
+	<exec dir="." executable="cmd.exe" output="ant.txt">
+	<arg line="/c merge.bat"/>
+	   </exec>
+	</target>	
+	<target name="render" >
+			 <condition property="xmlmain">
+			 	<equals arg1="${ztlBuild}" arg2="false" />
+	        </condition>
+			<condition property="ztlmain">
+			    <equals arg1="${ztlBuild}" arg2="true" />
+	        </condition>
+			<condition property="guidemain">
+			    <equals arg1="${ztlBuild}" arg2="guide" />
+	        </condition>
+			<condition property="tocmain">
+			    <equals arg1="${ztlBuild}" arg2="toc" />
+	        </condition>
+			<condition property="compmain">
+			    <equals arg1="${ztlBuild}" arg2="new" />
+	        </condition>
+			<condition property="xsltmain">
+			    <equals arg1="${ztlBuild}" arg2="xslt" />
+	        </condition>
+			<condition property="ztlxlsmain">
+			    <equals arg1="${ztlBuild}" arg2="xlst" />
+	        </condition>
+	</target> 
+	<target name="-ztlxlsmain" if="ztlxlsmain"> 
+		<xslt in="ztlcontribution.xml" out="output.html" style="contribution/guideGetterSetter.xsl"/>
+	</target>
+	<target name="-xsltmain" if="xsltmain">
+		  <delete file="ztlcontribution.xml"/>
+		  <do_concat source="config/beginztl.xml" destination="ztlcontribution.xml"/> 
+		  <foreach list="${components}" target="mergeztlFiles" param="theFile"/> 
+		  <do_concat source="config/endztl.xml" destination="ztlcontribution.xml"/> 
+		  <antcall target="xslt"/>
+	</target>
+	<target name="mergeztlFiles"> 
+		<do_concat source="config/contribs/${theFile}ztl.xml" destination="ztlcontribution.xml"/> 
+	</target>
+	<target name="-compmain" if="compmain">
+		 <foreach list="${components}" target="compilenew" param="theFile"/>
+	</target>
+	<target name="compilenew">
+	 <convertToLowerCase property="lowerCasetheFile" value="${theFile}" />
+		 <echo file="config/contribs/${theFile}.xml" />
+		 <echo file="config/contribs/${theFile}ztl.xml" />
+		 <echo file="contribution/${theFile}.txt">
+		 <![CDATA[id=${theFile}${line.separator}
+title=${theFile}${line.separator}
+newInstancePrefix=${theFile}${line.separator}
+icon=res/icons/${theFile}_16.png${line.separator}
+handlerType=div${line.separator}
+group=vbicharts${line.separator}
+databound=true${line.separator}
+conditionalformatting=none${line.separator}
+desc=Component Description${line.separator}
+propertySheetPath=res/additionalProperty/prod-html/${lowerCasetheFile}_additional_properties_sheet.html${line.separator}
+visible=true${line.separator}
+${line.separator}
+stdIncludeKind=${line.separator}
+jsInclude=res/js/vbi${theFile}.2.21.0.js${line.separator}
+${line.separator}
+${line.separator}
+supportsExportContent=false
+includeInBookmarkDialog=false
+cssInclude=${line.separator}
+additionalProperties= [{},codestate,codestate,String,false,false,value,(),false,notused],\${line.separator}
+[{},dateexp,dateexp,String,false,false,value,(),false,notused],\${line.separator}
+[{},harddate,harddate,String,false,false,value,(),false,notused],\${line.separator}
+[{},regkey,regkey,String,false,false,value,(),false,notused],\${line.separator}
+[{},keyperiod,keyperiod,String,false,false,value,(),false,notused],\${line.separator}
+[{},imglog,imglog,String,false,false,value,(),false,notused],\${line.separator}
+${line.separator}
+mainProperties= ${line.separator}
+${line.separator}
+defaultValue= (codestate|active)^(dateexp|2020-12-19)^(harddate|2020-04-01)^(imglog|false)^(regkey|{239487-23423423-234234})^(WIDTH|100)^(HEIGHT|100)^(TOP_MARGIN|30)^(LEFT_MARGIN|30)^]]>
+		 </echo>
+		 <echo file="res/additionalProperty/prod-html/${lowerCasetheFile}_additional_properties_sheet.html" /> 
+		 <echo file="res/js/vbi${theFile}.2.21.0.js" />
+		 <echo file="contribution/custom/${theFile}.properties" />
+		 
+		 <loadfile srcfile="res/config/componentConfig.js" property="configContent">
+			      <filterchain>
+			        <filterreader classname="org.apache.tools.ant.filters.TailFilter">
+			          <param name="lines" value="-1"/>
+			          <param name="skip" value="1"/>
+			        </filterreader>
+			    </filterchain>
+			</loadfile>
+			<echo file="res/config/componentConfig.js">${configContent}</echo>
+		 <echo file="res/config/componentConfig.js" append="true" ><![CDATA[,
+		 com_visualbi_${lowerCasetheFile}:{ class: 'vbi${theFile}', mode: 'full',version:"0.1.0",tag:"Pre-release alpha",aps:'${theFile}'}
+		 }]]></echo>
+		  <loadfile srcfile="config/contributionTemplate.xml" property="contributionTemplateContent">
+			      <filterchain>
+			        <filterreader classname="org.apache.tools.ant.filters.TailFilter">
+			          <param name="lines" value="-1"/>
+			          <param name="skip" value="1"/>
+			        </filterreader>
+			    </filterchain>
+			</loadfile>			
+			<echo file="config/contributionTemplate.xml">${contributionTemplateContent}</echo>
+		 <echo file="config/contributionTemplate.xml" append="true" ><![CDATA[	<!--${theFile} component-->
+		@${theFile}@
+		</sdkExtension>	]]></echo>
+
+		
+		 <loadfile srcfile="properties.xml" property="propertiesContent">
+			      <filterchain>
+			        <filterreader classname="org.apache.tools.ant.filters.TailFilter">
+			          <param name="lines" value="-1"/>
+			          <param name="skip" value="1"/>
+			        </filterreader>
+			    </filterchain>
+			</loadfile>			
+			<echo file="properties.xml">${propertiesContent}</echo>
+		 <echo file="properties.xml" append="true" ><![CDATA[	ENTITY ${theFile} SYSTEM "contribution\custom\${theFile}.properties"
+		&${theFile};
+		</properties>	]]></echo> 
+		<loadfile srcfile="config/ztlcontributionTemplate.xml" property="ztlcontributionTemplateContent">
+			      <filterchain>
+			        <filterreader classname="org.apache.tools.ant.filters.TailFilter">
+			          <param name="lines" value="-1"/>
+			          <param name="skip" value="1"/>
+			        </filterreader>
+			    </filterchain>
+			</loadfile>
+			<echo file="config/ztlcontributionTemplate.xml">${ztlcontributionTemplateContent}</echo>
+		 <echo file="config/ztlcontributionTemplate.xml" append="true" ><![CDATA[	<!--${theFile} component-->
+		@${theFile}@
+		</sdkExtension>	]]></echo>
+
+		 <echo file="build.txt"><![CDATA[
+		 <loadfile property="${theFile}" srcFile="config/contribs/${theFile}.xml" />
+		 <token key="${theFile}" value="${theFile}" />
+
+		 <loadfile property="${theFile}" srcFile="config/contribs/${theFile}ztl.xml" />
+		 <token key="${theFile}" value="${theFile}" />]]></echo>
+	</target>
+	<target name="-tocmain" if="tocmain">
+		<foreach list="${groups}" target="compiletoc" param="theGroup"/>
+	</target>
+	<target name="compiletoc" >
+	<!-- Chart / Selector / Util / Map -->
+		<xslt in="ztlcontribution.xml" out="contribution\toc\Script${theGroup}.xml" style="contribution\guideToc${theGroup}Sample.xsl"/>
+		<xslt in="ztlcontribution.xml" out="contribution\toc\${theGroup}.xml" style="contribution\guideToc${theGroup}Prop.xsl"/>
+		<xslt in="ztlcontribution.xml" out="contribution\toc\About${theGroup}.xml" style="contribution\guideToc${theGroup}About.xsl"/>
+ 	</target>
+	<target name="-guidemain" if="guidemain">
+		<xslt in="ztlcontribution.xml" out="contribution\desc\AboutToc.html" style="contribution\guideToc.xsl"/>
+		<foreach list="${components}" target="compileguide" param="theFile"/>
+	</target>
+	<target name="compileguide">
+		<xslt in="config\contribs\${theFile}ztl.xml" out="contribution\html\${theFile}_Setter.html" style="contribution\guideSetter.xsl"/>
+		<xslt in="config\contribs\${theFile}ztl.xml" out="contribution\html\${theFile}_Getter.html" style="contribution\guideGetter.xsl"/>
+		<xslt in="config\contribs\${theFile}ztl.xml" out="contribution\desc\${theFile}_About.html" style="contribution\guideProp.xsl"/> 
+		<xslt in="config\contribs\${theFile}.xml" out="contribution\html\prop\${theFile}_Properties.html" style="contribution\guideProperty.xsl"/>
+		<property name="browser" location="C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"/>
+		<!--<exec executable="${browser}" spawn="true">
+		    <arg value="contribution\html\prop\${theFile}_Properties.html"/>
+		</exec>-->
+	</target>
+	<target name="-xmlmain" if="xmlmain"> 
+		<foreach list="${components}" target="compile" param="theFile"/>
+		<antcall target="compileFiles"/>
+	</target>
+	<target name="xslt">
+		<xslt in="ztlcontribution.xml" out="output.txt" style="contribution.xsl"/> 
+		<loadfile srcfile="output.txt" property="ztl">
+			  <filterchain>
+				<filterreader classname="org.apache.tools.ant.filters.HeadFilter">
+				  <param name="lines" value="-1"/>
+				  <param name="skip" value="1"/>
+				</filterreader>
+			</filterchain>
+		</loadfile>
+        <echo message="${ztl}" file="contribution.ztl" />  
+		<delete file="output.txt"/>
+	</target>
+	<target name="-ztlmain" if="ztlmain" >
+		<foreach list="${components}" target="ztlcompile" param="theFile"/>
+		<antcall target="compileztlFiles"/>
+		<antcall target="xslt"/>
+	</target>
+	<target name="compileFiles">
+	    <loadfile property="Insights" srcFile="config/contribs/Insights.xml" />
+		<loadfile property="MultiSelectBox" srcFile="config/contribs/MultiSelectBox.xml" />
+		<loadfile property="PackedBubble" srcFile="config/contribs/PackedBubble.xml" /> 
+		<loadfile property="ActivityGauge" srcFile="config/contribs/ActivityGauge.xml" />
+	    <loadfile property="VBXTheme" srcFile="config/contribs/VBXTheme.xml" />
+		<loadfile property="SmartEditor" srcFile="config/contribs/SmartEditor.xml" />
+		<loadfile property="Analytics" srcFile="config/contribs/Analytics.xml" />
+		<loadfile property="CesiumMap" srcFile="config/contribs/CesiumMap.xml" />
+		<loadfile property="PeriodSelectorDWM" srcFile="config/contribs/PeriodSelectorDWM.xml" />
+		<loadfile property="SunBurst" srcFile="config/contribs/SunBurst.xml" />
+		<loadfile property="AdvancedColumnBarChart" srcFile="config/contribs/AdvancedColumnBarChart.xml" />
+		<loadfile property="SlopeChart" srcFile="config/contribs/SlopeChart.xml" />
+		<loadfile property="GoogleMap" srcFile="config/contribs/GoogleMap.xml" />
+		<loadfile property="ESRIMap" srcFile="config/contribs/ESRIMap.xml" />
+		<loadfile property="ODataSource" srcFile="config/contribs/ODataSource.xml" />
+		<loadfile property="DataMerge" srcFile="config/contribs/DataMerge.xml" />
+		<loadfile property="WebServiceDataSource" srcFile="config/contribs/WebServiceDataSource.xml" />
+		<loadfile property="ConstantDataSource" srcFile="config/contribs/ConstantDataSource.xml" />
+		<loadfile property="TreeMapDrilldown" srcFile="config/contribs/TreeMapDrilldown.xml" />
+		<loadfile property="AdvancedGauge" srcFile="config/contribs/AdvancedGauge.xml" />
+		<loadfile property="TreeMap" srcFile="config/contribs/TreeMap.xml" />
+		<loadfile property="LinearGauge" srcFile="config/contribs/LinearGauge.xml" />
+		<loadfile property="CustomDataSource" srcFile="config/contribs/CustomDataSource.xml" />
+		<loadfile property="MailExport" srcFile="config/contribs/MailExport.xml" />
+		<loadfile property="WaffleChart" srcFile="config/contribs/WaffleChart.xml" />
+		<loadfile property="Pictogram" srcFile="config/contribs/Pictogram.xml" />
+		<loadfile property="CalendarHeatmap" srcFile="config/contribs/CalendarHeatmap.xml" />
+		<loadfile property="RiskMatrixChart" srcFile="config/contribs/RiskMatrixChart.xml" />
+		<loadfile property="TrendIcon" srcFile="config/contribs/TrendIcon.xml" />
+		<loadfile property="HierarchialFilter" srcFile="config/contribs/HierarchialFilter.xml" />
+		<loadfile property="ListBox" srcFile="config/contribs/ListBox.xml" />
+		<loadfile property="ChartSelector" srcFile="config/contribs/ChartSelector.xml" />
+		<loadfile property="IndoorAnalyzer" srcFile="config/contribs/IndoorAnalyzer.xml" />
+		<loadfile property="RadarChart" srcFile="config/contribs/RadarChart.xml" />
+		<loadfile property="ChartContainer" srcFile="config/contribs/ChartContainer.xml" />
+		<loadfile property="FixedColumnChart" srcFile="config/contribs/FixedColumnChart.xml" />
+		<loadfile property="DualAxesChart" srcFile="config/contribs/DualAxesChart.xml" />
+		<loadfile property="MultipleAxesChart" srcFile="config/contribs/MultipleAxesChart.xml" />
+		<loadfile property="Table" srcFile="config/contribs/Table.xml" />
+		<loadfile property="KPITile" srcFile="config/contribs/KPITile.xml" />
+		<loadfile property="AdvancedKPITile" srcFile="config/contribs/AdvancedKPITile.xml" />
+		<loadfile property="GridBox" srcFile="config/contribs/GridBox.xml" />
+		<loadfile property="HTMLBox" srcFile="config/contribs/HTMLBox.xml" />
+		<loadfile property="ScriptBox" srcFile="config/contribs/ScriptBox.xml" />
+		<loadfile property="TagCloud" srcFile="config/contribs/TagCloud.xml" />
+		<loadfile property="RangeSlider" srcFile="config/contribs/RangeSlider.xml" />
+		<loadfile property="PolarChart" srcFile="config/contribs/PolarChart.xml" />
+		<loadfile property="Menu" srcFile="config/contribs/Menu.xml" />
+		<loadfile property="DOCExport" srcFile="config/contribs/DOCExport.xml" />
+		<loadfile property="DataProvider" srcFile="config/contribs/DataProvider.xml" />
+		<loadfile property="MarimekkoChart" srcFile="config/contribs/MarimekkoChart.xml" />
+		<loadfile property="ResponsiveUI" srcFile="config/contribs/ResponsiveUI.xml" />
+		<loadfile property="LocationAnalyzer" srcFile="config/contribs/LocationAnalyzer.xml" />
+		<loadfile property="PeriodSelectorYM" srcFile="config/contribs/PeriodSelectorYM.xml" />
+		<loadfile property="PeriodSelectorYQM" srcFile="config/contribs/PeriodSelectorYQM.xml" />
+		<loadfile property="PeriodSelectorYQMM" srcFile="config/contribs/PeriodSelectorYQMM.xml" />
+		<loadfile property="Searchbox" srcFile="config/contribs/Searchbox.xml" />
+		<loadfile property="ComboBox" srcFile="config/contribs/ComboBox.xml" />
+		<loadfile property="VbiPdfExport" srcFile="config/contribs/VbiPdfExport.xml" />
+		<loadfile property="SparkLineTableChart" srcFile="config/contribs/SparkLineTableChart.xml" />
+		<loadfile property="SparkLineChart" srcFile="config/contribs/SparkLineChart.xml" />
+		<loadfile property="LineChart" srcFile="config/contribs/LineChart.xml" />
+		<loadfile property="ProgressBar" srcFile="config/contribs/ProgressBar.xml" />
+		<loadfile property="StackedColumnBarChart" srcFile="config/contribs/StackedColumnBarChart.xml" />
+		<loadfile property="ColumnBarChart" srcFile="config/contribs/ColumnBarChart.xml" />
+		<loadfile property="ColumnBarChartNew" srcFile="config/contribs/ColumnBarChartNew.xml" />
+		<loadfile property="BoxPlotChart" srcFile="config/contribs/BoxPlotChart.xml" />
+		<loadfile property="ColumnBarDrilldownChart" srcFile="config/contribs/ColumnBarDrilldownChart.xml" />
+		<loadfile property="PieChart" srcFile="config/contribs/PieChart.xml" />
+		<loadfile property="SpieChart" srcFile="config/contribs/SpieChart.xml" />
+		<loadfile property="PieDrilldownChart" srcFile="config/contribs/PieDrilldownChart.xml" />
+		<loadfile property="WaterfallChart" srcFile="config/contribs/WaterfallChart.xml" />
+		<loadfile property="AreaChart" srcFile="config/contribs/AreaChart.xml" />
+		<loadfile property="GroupStackedColumnBarChart" srcFile="config/contribs/GroupStackedColumnBarChart.xml" />
+		<loadfile property="BulletChart" srcFile="config/contribs/BulletChart.xml" />
+		<loadfile property="StackedAreaChart" srcFile="config/contribs/StackedAreaChart.xml" />
+		<loadfile property="HCMap" srcFile="config/contribs/HCMap.xml" />
+		<loadfile property="PPTExport" srcFile="config/contribs/PPTExport.xml" />
+		<loadfile property="NumberCounter" srcFile="config/contribs/NumberCounter.xml" />
+		<loadfile property="CircularCounter" srcFile="config/contribs/CircularCounter.xml" />
+		<loadfile property="FunnelPyramidChart" srcFile="config/contribs/FunnelPyramidChart.xml" />
+		<loadfile property="DonutChart" srcFile="config/contribs/DonutChart.xml" />
+		<loadfile property="SemicircledonutChart" srcFile="config/contribs/SemicircledonutChart.xml" />
+		<loadfile property="CombinationChart" srcFile="config/contribs/CombinationChart.xml" />
+		<loadfile property="BubbleChart" srcFile="config/contribs/BubbleChart.xml" />
+		<loadfile property="ScatterChart" srcFile="config/contribs/ScatterChart.xml" />
+		<loadfile property="SuperCombinationChart" srcFile="config/contribs/SuperCombinationChart.xml" />
+		<loadfile property=	"AngularGauge" srcFile="config/contribs/AngularGauge.xml" />
+		<loadfile property="FunnelPyramidDrilldownChart" srcFile="config/contribs/FunnelPyramidDrilldownChart.xml" />
+		<loadfile property="SolidGauge" srcFile="config/contribs/SolidGauge.xml" />
+		<loadfile property="advancedlabel" srcFile="config/contribs/advancedlabel.xml" />
+		<loadfile property="HeatMapChart" srcFile="config/contribs/HeatMapChart.xml" />
+		<loadfile property="WhatIfAnalyzer" srcFile="config/contribs/WhatIfAnalyzer.xml" />
+		<loadfile property="FacetFilter" srcFile="config/contribs/FacetFilter.xml" />
+		<loadfile property="TableBeta" srcFile="config/contribs/TableBeta.xml" />
+		<loadfile property="GanttChart" srcFile="config/contribs/GanttChart.xml" />
+		<loadfile property="TrellisChart" srcFile="config/contribs/TrellisChart.xml" />
+		<loadfile property="TimeSlicer" srcFile="config/contribs/TimeSlicer.xml" />		 
+		<loadfile property="DataUtility" srcFile="config/contribs/DataUtility.xml" />
+		<loadfile property="StreamGraph" srcFile="config/contribs/StreamGraph.xml" />
+		<loadfile property="Sankey" srcFile="config/contribs/Sankey.xml" />
+		<loadfile property="DataUtilitySource" srcFile="config/contribs/DataUtilitySource.xml" />
+		<loadfile property="ParallelCoordinates" srcFile="config/contribs/ParallelCoordinates.xml" />
+   	<loadfile property="NetworkChart" srcFile="config/contribs/NetworkChart.xml" />
+		<loadfile property="ScatterPunch" srcFile="config/contribs/ScatterPunch.xml" />
+   	<loadfile property="TornadoChart" srcFile="config/contribs/TornadoChart.xml" />
+		<loadfile property="RainFallChart" srcFile="config/contribs/RainFallChart.xml" />
+		<loadfile property="VennDiagram" srcFile="config/contribs/VennDiagram.xml" />
+		<loadfile property="RConfiguration" srcFile="config/contribs/RConfiguration.xml" />
+		<loadfile property="RScriptBox" srcFile="config/contribs/RScriptBox.xml" />
+		<loadfile property="RContainer" srcFile="config/contribs/RContainer.xml" />
+		<loadfile property="Chord" srcFile="config/contribs/Chord.xml" />
+		<loadfile property="TimeSeries" srcFile="config/contribs/TimeSeries.xml" />
+
+		<copy file="config/contributionTemplate.xml" tofile="contribution.xml" overwrite="${overwrite.files}">
+				<filterchain>
+					<replacetokens>
+						<token key="ScatterPunch" value="${ScatterPunch}" />
+					    <token key="TornadoChart" value="${TornadoChart}" />
+							<token key="NetworkChart" value="${NetworkChart}" />
+					    <token key="AdvancedColumnBarChart" value="${AdvancedColumnBarChart}" />
+						<token key="SunBurst" value="${SunBurst}" />
+						<token key="ActivityGauge" value="${ActivityGauge}" /> 
+						<token key="SlopeChart" value="${SlopeChart}" />
+  					    <token key="PeriodSelectorDWM" value="${PeriodSelectorDWM}" />
+  					    <token key="GoogleMap" value="${GoogleMap}" />
+  					    <token key="ESRIMap" value="${ESRIMap}" />
+						<token key="DataUtilitySource" value="${DataUtilitySource}" />
+						<token key="DataUtility" value="${DataUtility}" /> 
+						<token key="StreamGraph" value="${StreamGraph}" />
+						<token key="Sankey" value="${Sankey}" /> 
+						<token key="ParallelCoordinates" value="${ParallelCoordinates}" />		
+						<token key="ODataSource" value="${ODataSource}" />
+						<token key="TrellisChart" value="${TrellisChart}" />
+						<token key="TimeSlicer" value="${TimeSlicer}" />
+						<token key="GanttChart" value="${GanttChart}" /> 
+						<token key="DataMerge" value="${DataMerge}" />
+						<token key="WebServiceDataSource" value="${WebServiceDataSource}" />
+						<token key="ConstantDataSource" value="${ConstantDataSource}" />
+						<token key="TreeMapDrilldown" value="${TreeMapDrilldown}" />
+					    <token key="LinearGauge" value="${LinearGauge}" />
+						<token key="AdvancedGauge" value="${AdvancedGauge}" />
+						<token key="TreeMap" value="${TreeMap}" />
+						<token key="IndoorAnalyzer" value="${IndoorAnalyzer}" />
+						<token key="CustomDataSource" value="${CustomDataSource}" />
+						<token key="HierarchialFilter" value="${HierarchialFilter}" />
+						<token key="ChartSelector" value="${ChartSelector}" />
+						<token key="ChartContainer" value="${ChartContainer}" />
+						<token key="FixedColumnChart" value="${FixedColumnChart}" />
+						<token key="DualAxesChart" value="${DualAxesChart}" />
+						<token key="ComboBox" value="${ComboBox}" />
+						<token key="DataProvider" value="${DataProvider}" />
+						<token key="MultipleAxesChart" value="${MultipleAxesChart}" />
+						<token key="Table" value="${Table}" />
+						<token key="KPITile" value="${KPITile}" />
+						<token key="AdvancedKPITile" value="${AdvancedKPITile}" />
+						<token key="GridBox" value="${GridBox}" />
+						<token key="HTMLBox" value="${HTMLBox}" />
+						<token key="ScriptBox" value="${ScriptBox}" />
+						<token key="TagCloud" value="${TagCloud}" />
+						<token key="RangeSlider" value="${RangeSlider}" />
+						<token key="Menu" value="${Menu}" />
+						<token key="PPTExport" value="${PPTExport}" />
+						<token key="ListBox" value="${ListBox}" />
+						<token key="ResponsiveUI" value="${ResponsiveUI}" />
+						<token key="MarimekkoChart" value="${MarimekkoChart}" />
+						<token key="PolarChart" value="${PolarChart}" />
+						<token key="LocationAnalyzer" value="${LocationAnalyzer}" />
+						<token key="PeriodSelectorYM" value="${PeriodSelectorYM}" />
+						<token key="PeriodSelectorYQM" value="${PeriodSelectorYQM}" />
+						<token key="PeriodSelectorYQMM" value="${PeriodSelectorYQMM}" />
+						<token key="Searchbox" value="${Searchbox}" />
+						<token key="LineChart" value="${LineChart}" />
+						<token key="ProgressBar" value="${ProgressBar}" />
+						<token key="StackedColumnBarChart" value="${StackedColumnBarChart}" />
+						<token key="ColumnBarChart" value="${ColumnBarChart}" />
+						<token key="ColumnBarChartNew" value="${ColumnBarChartNew}" />
+						<token key="DOCExport" value="${DOCExport}" />
+						<token key="BoxPlotChart" value="${BoxPlotChart}" />
+						<token key="ColumnBarDrilldownChart" value="${ColumnBarDrilldownChart}" />
+						<token key="PieChart" value="${PieChart}" />
+						<token key="SpieChart" value="${SpieChart}" />	
+						<token key="PieDrilldownChart" value="${PieDrilldownChart}" />
+						<token key="WaterfallChart" value="${WaterfallChart}" />
+						<token key="AreaChart" value="${AreaChart}" />
+						<token key="SparkLineTableChart" value="${SparkLineTableChart}" />
+						<token key="SparkLineChart" value="${SparkLineChart}" />
+						<token key="VbiPdfExport" value="${VbiPdfExport}" />
+						<token key="GroupStackedColumnBarChart" value="${GroupStackedColumnBarChart}" />
+						<token key="BulletChart" value="${BulletChart}" />
+						<token key="StackedAreaChart" value="${StackedAreaChart}" />
+						<token key="HCMap" value="${HCMap}" />
+						<token key="NumberCounter" value="${NumberCounter}" />
+						<token key="CircularCounter" value="${CircularCounter}" />
+						<token key="FunnelPyramidChart" value="${FunnelPyramidChart}" />
+						<token key="DonutChart" value="${DonutChart}" />
+						<token key="SemicircledonutChart" value="${SemicircledonutChart}" />
+						<token key="CombinationChart" value="${CombinationChart}" />
+						<token key="BubbleChart" value="${BubbleChart}" />
+						<token key="ScatterChart" value="${ScatterChart}" />
+						<token key="SuperCombinationChart" value="${SuperCombinationChart}" />
+						<token key="AngularGauge" value="${AngularGauge}" />
+						<token key="FunnelPyramidDrilldownChart" value="${FunnelPyramidDrilldownChart}" />
+						<token key="SolidGauge" value="${SolidGauge}" />
+						<token key="advancedlabel" value="${advancedlabel}" />
+						<token key="HeatMapChart" value="${HeatMapChart}" />
+						<token key="WhatIfAnalyzer" value="${WhatIfAnalyzer}" />
+						<token key="RadarChart" value="${RadarChart}" />
+						<token key="FacetFilter" value="${FacetFilter}" />
+						<token key="TrendIcon" value="${TrendIcon}" />
+						<token key="RiskMatrixChart" value="${RiskMatrixChart}" />
+						<token key="MailExport" value="${MailExport}" />
+						<token key="WaffleChart" value="${WaffleChart}" />
+						<token key="Pictogram" value="${Pictogram}" />
+						<token key="CalendarHeatmap" value="${CalendarHeatmap}" />
+						<token key="TableBeta" value="${TableBeta}" />
+						<token key="VBXTheme" value="${VBXTheme}" />  
+						<token key="CesiumMap" value="${CesiumMap}" /> 
+						<token key="SmartEditor" value="${SmartEditor}" /> 
+						<token key="Analytics" value="${Analytics}" />
+						<token key="Insights" value="${Insights}" />
+						<token key="MultiSelectBox" value="${MultiSelectBox}" />
+						<token key="PackedBubble" value="${PackedBubble}" />
+						<token key="RainFallChart" value="${RainFallChart}" />
+						<token key="VennDiagram" value="${VennDiagram}" />
+						<token key="RConfiguration" value="${RConfiguration}" />
+						<token key="RScriptBox" value="${RScriptBox}" />
+						<token key="RContainer" value="${RContainer}" />
+						<token key="Chord" value="${Chord}" />
+						<token key="TimeSeries" value="${TimeSeries}" />
+					</replacetokens>
+				</filterchain>
+			</copy>
+			<delete file="config/defval.xml"/>
+			<delete file="config/jstest.xml" />
+			<delete file="config/csstest.xml" />
+			<delete file="config/contrib_component.xml" /> 			
+			<if><equals arg1="${mobileCompatible}" arg2="false" /><then> 
+				<loadfile property="contribOutput" srcFile="contribution.xml" />
+				<propertyregex property="contribOutput1.6" input="${contribOutput}" regexp="includeInBookmarkDialog=.([a-z])\w+. supportsExportContent=.([a-z])\w+." replace="" casesensitive="false" />
+			  	<echo message="${contribOutput1.6}" file="contribution.xml" />
+			</then><elseif><equals arg1="${mobileCompatible}" arg2="true" /><then> 
+				 <loadfile property="contribOutput" srcFile="contribution.xml" />
+				 <echo message="${contribOutput}" file="contribution.xml" /> 
+			</then></elseif></if> 
+		</target>
+	<target name="compileztlFiles">
+		<loadfile property="PackedBubble" srcFile="config/contribs/PackedBubbleztl.xml" />
+		<loadfile property="MultiSelectBox" srcFile="config/contribs/MultiSelectBoxztl.xml" />
+		<loadfile property="Insights" srcFile="config/contribs/Insightsztl.xml" />
+		<loadfile property="SmartEditor" srcFile="config/contribs/SmartEditorztl.xml" />
+		<loadfile property="Analytics" srcFile="config/contribs/Analyticsztl.xml" />
+		<loadfile property="AdvancedColumnBarChart" srcFile="config/contribs/AdvancedColumnBarChartztl.xml" />
+		<loadfile property="VBXTheme" srcFile="config/contribs/VBXThemeztl.xml" /> 
+  	    <loadfile property="PeriodSelectorDWM" srcFile="config/contribs/PeriodSelectorDWMztl.xml" />
+		<loadfile property="SunBurst" srcFile="config/contribs/SunBurstztl.xml" />
+		<loadfile property="SlopeChart" srcFile="config/contribs/SlopeChartztl.xml" />
+		<loadfile property="GoogleMap" srcFile="config/contribs/GoogleMapztl.xml" />
+		<loadfile property="ESRIMap" srcFile="config/contribs/ESRIMapztl.xml" />
+		<loadfile property="ODataSource" srcFile="config/contribs/ODataSourceztl.xml" />	
+		<loadfile property="ConstantDataSource" srcFile="config/contribs/ConstantDataSourceztl.xml" />
+	    <loadfile property="TreeMapDrilldown" srcFile="config/contribs/TreeMapDrilldownztl.xml" />
+		<loadfile property="LinearGauge" srcFile="config/contribs/LinearGaugeztl.xml" />
+		<loadfile property="MailExport" srcFile="config/contribs/MailExportztl.xml" />
+		<loadfile property="CalendarHeatmap" srcFile="config/contribs/CalendarHeatmapztl.xml" />
+		<loadfile property="CustomDataSource" srcFile="config/contribs/CustomDataSourceztl.xml" />
+		<loadfile property="RiskMatrixChart" srcFile="config/contribs/RiskMatrixChartztl.xml" />
+		<loadfile property="TrendIcon" srcFile="config/contribs/TrendIconztl.xml" />
+		<loadfile property="HierarchialFilter" srcFile="config/contribs/HierarchialFilterztl.xml" />
+		<loadfile property="ChartSelector" srcFile="config/contribs/ChartSelectorztl.xml" />
+		<loadfile property="ChartContainer" srcFile="config/contribs/ChartContainerztl.xml" />
+		<loadfile property="FixedColumnChart" srcFile="config/contribs/FixedColumnChartztl.xml" />
+		<loadfile property="DualAxesChart" srcFile="config/contribs/DualAxesChartztl.xml" />
+		<loadfile property="MultipleAxesChart" srcFile="config/contribs/MultipleAxesChartztl.xml" />
+		<loadfile property="Table" srcFile="config/contribs/Tableztl.xml" />
+		<loadfile property="TableBeta" srcFile="config/contribs/TableBetaztl.xml" />
+		<loadfile property="WaffleChart" srcFile="config/contribs/WaffleChartztl.xml" />
+		<loadfile property="Pictogram" srcFile="config/contribs/Pictogramztl.xml" />
+		<loadfile property="KPITile" srcFile="config/contribs/KPITileztl.xml" />
+		<loadfile property="AdvancedKPITile" srcFile="config/contribs/AdvancedKPITileztl.xml" />
+		<loadfile property="GridBox" srcFile="config/contribs/GridBoxztl.xml" />
+		<loadfile property="AdvancedGauge" srcFile="config/contribs/AdvancedGaugeztl.xml" />
+		<loadfile property="TreeMap" srcFile="config/contribs/TreeMapztl.xml" />
+		<loadfile property="HTMLBox" srcFile="config/contribs/HTMLBoxztl.xml" />
+		<loadfile property="ScriptBox" srcFile="config/contribs/ScriptBoxztl.xml" />
+		<loadfile property="TagCloud" srcFile="config/contribs/TagCloudztl.xml" />
+		<loadfile property="RangeSlider" srcFile="config/contribs/RangeSliderztl.xml" />
+		<loadfile property="Menu" srcFile="config/contribs/Menuztl.xml" />
+		<loadfile property="ResponsiveUI" srcFile="config/contribs/ResponsiveUIztl.xml" />
+		<loadfile property="LocationAnalyzer" srcFile="config/contribs/LocationAnalyzerztl.xml" />
+		<loadfile property="PeriodSelectorYM" srcFile="config/contribs/PeriodSelectorYMztl.xml" />
+		<loadfile property="PeriodSelectorYQM" srcFile="config/contribs/PeriodSelectorYQMztl.xml" />
+		<loadfile property="PeriodSelectorYQMM" srcFile="config/contribs/PeriodSelectorYQMMztl.xml" />
+		<loadfile property="VbiPdfExport" srcFile="config/contribs/VbiPdfExportztl.xml" />
+		<loadfile property="SparkLineTableChart" srcFile="config/contribs/SparkLineTableChartztl.xml" />
+		<loadfile property="SparkLineChart" srcFile="config/contribs/SparkLineChartztl.xml" />
+		<loadfile property="Searchbox" srcFile="config/contribs/Searchboxztl.xml" />
+		<loadfile property="LineChart" srcFile="config/contribs/LineChartztl.xml" />
+		<loadfile property="ProgressBar" srcFile="config/contribs/ProgressBarztl.xml" />
+		<loadfile property="RadarChart" srcFile="config/contribs/RadarChartztl.xml" />
+		<loadfile property="StackedColumnBarChart" srcFile="config/contribs/StackedColumnBarChartztl.xml" />
+		<loadfile property="MarimekkoChart" srcFile="config/contribs/MarimekkoChartztl.xml" />
+		<loadfile property="ColumnBarChart" srcFile="config/contribs/ColumnBarChartztl.xml" />
+		<loadfile property="ColumnBarChartNew" srcFile="config/contribs/ColumnBarChartNewztl.xml" />
+		<loadfile property="BoxPlotChart" srcFile="config/contribs/BoxPlotChartztl.xml" />
+		<loadfile property="ColumnBarDrilldownChart" srcFile="config/contribs/ColumnBarDrilldownChartztl.xml" />
+		<loadfile property="PieChart" srcFile="config/contribs/PieChartztl.xml" />
+		<loadfile property="SpieChart" srcFile="config/contribs/SpieChartztl.xml" />
+		<loadfile property="CesiumMap" srcFile="config/contribs/CesiumMapztl.xml" />
+		<loadfile property="PieDrilldownChart" srcFile="config/contribs/PieDrilldownChartztl.xml" />
+		<loadfile property="WaterfallChart" srcFile="config/contribs/WaterfallChartztl.xml" />
+		<loadfile property="AreaChart" srcFile="config/contribs/AreaChartztl.xml" />
+		<loadfile property="GroupStackedColumnBarChart" srcFile="config/contribs/GroupStackedColumnBarChartztl.xml" />
+		<loadfile property="BulletChart" srcFile="config/contribs/BulletChartztl.xml" />
+		<loadfile property="PPTExport" srcFile="config/contribs/PPTExportztl.xml" />
+		<loadfile property="IndoorAnalyzer" srcFile="config/contribs/IndoorAnalyzerztl.xml" />
+		<loadfile property="StackedAreaChart" srcFile="config/contribs/StackedAreaChartztl.xml" />
+		<loadfile property="HCMap" srcFile="config/contribs/HCMapztl.xml" />
+		<loadfile property="NumberCounter" srcFile="config/contribs/NumberCounterztl.xml" />
+		<loadfile property="CircularCounter" srcFile="config/contribs/CircularCounterztl.xml" />
+		<loadfile property="FunnelPyramidChart" srcFile="config/contribs/FunnelPyramidChartztl.xml" />
+		<loadfile property="DonutChart" srcFile="config/contribs/DonutChartztl.xml" />
+		<loadfile property="SemicircledonutChart" srcFile="config/contribs/SemicircledonutChartztl.xml" />
+		<loadfile property="ComboBox" srcFile="config/contribs/ComboBoxztl.xml" />
+		<loadfile property="CombinationChart" srcFile="config/contribs/CombinationChartztl.xml" />
+		<loadfile property="ListBox" srcFile="config/contribs/ListBoxztl.xml" />
+		<loadfile property="BubbleChart" srcFile="config/contribs/BubbleChartztl.xml" />
+		<loadfile property="ScatterChart" srcFile="config/contribs/ScatterChartztl.xml" />
+		<loadfile property="SuperCombinationChart" srcFile="config/contribs/SuperCombinationChartztl.xml" />
+		<loadfile property=	"AngularGauge" srcFile="config/contribs/AngularGaugeztl.xml" />
+		<loadfile property="FunnelPyramidDrilldownChart" srcFile="config/contribs/FunnelPyramidDrilldownChartztl.xml" />
+		<loadfile property="SolidGauge" srcFile="config/contribs/SolidGaugeztl.xml" />
+		<loadfile property="DOCExport" srcFile="config/contribs/DOCExportztl.xml" />
+		<loadfile property="DataProvider" srcFile="config/contribs/DataProviderztl.xml" />
+		<loadfile property="advancedlabel" srcFile="config/contribs/advancedlabelztl.xml" />
+		<loadfile property="HeatMapChart" srcFile="config/contribs/HeatMapChartztl.xml" />
+		<loadfile property="WhatIfAnalyzer" srcFile="config/contribs/WhatIfAnalyzerztl.xml" />
+		<loadfile property="PolarChart" srcFile="config/contribs/PolarChartztl.xml" />
+		<loadfile property="FacetFilter" srcFile="config/contribs/FacetFilterztl.xml" />
+		<loadfile property="GanttChart" srcFile="config/contribs/GanttChartztl.xml" /> 
+		<loadfile property="WebServiceDataSource" srcFile="config/contribs/WebServiceDataSourceztl.xml" />
+		<loadfile property="TrellisChart" srcFile="config/contribs/TrellisChartztl.xml" />
+		<loadfile property="DataMerge" srcFile="config/contribs/DataMergeztl.xml" />
+		<loadfile property="TimeSlicer" srcFile="config/contribs/TimeSlicerztl.xml" />
+		<loadfile property="DataUtility" srcFile="config/contribs/DataUtilityztl.xml" />
+		<loadfile property="StreamGraph" srcFile="config/contribs/StreamGraphztl.xml" />
+		<loadfile property="ActivityGauge" srcFile="config/contribs/ActivityGaugeztl.xml" />
+		<loadfile property="Sankey" srcFile="config/contribs/Sankeyztl.xml" />
+		<loadfile property="ParallelCoordinates" srcFile="config/contribs/ParallelCoordinatesztl.xml" /> 
+		<loadfile property="DataUtilitySource" srcFile="config/contribs/DataUtilitySourceztl.xml" />
+		<loadfile property="NetworkChart" srcFile="config/contribs/NetworkChartztl.xml" />
+		<loadfile property="ScatterPunch" srcFile="config/contribs/ScatterPunchztl.xml" />
+		<loadfile property="TornadoChart" srcFile="config/contribs/TornadoChartztl.xml" />
+		<loadfile property="RainFallChart" srcFile="config/contribs/RainFallChartztl.xml" />
+		<loadfile property="VennDiagram" srcFile="config/contribs/VennDiagramztl.xml" />
+		<loadfile property="RConfiguration" srcFile="config/contribs/RConfigurationztl.xml" />
+		<loadfile property="RScriptBox" srcFile="config/contribs/RScriptBoxztl.xml" />
+		<loadfile property="RContainer" srcFile="config/contribs/RContainerztl.xml" />
+		<loadfile property="Chord" srcFile="config/contribs/Chordztl.xml" />
+		<loadfile property="TimeSeries" srcFile="config/contribs/TimeSeriesztl.xml" />
+
+		<copy file="config/ztlcontributionTemplate.xml" tofile="ztlcontribution.xml" overwrite="${overwrite.files}">
+			<filterchain>
+				<replacetokens> 
+					<token key="NetworkChart" value="${NetworkChart}" />
+					<token key="ScatterPunch" value="${ScatterPunch}" />
+				  <token key="TornadoChart" value="${TornadoChart}" />
+					<token key="AdvancedColumnBarChart" value="${AdvancedColumnBarChart}" />
+					<token key="SmartEditor" value="${SmartEditor}" /> 
+					<token key="ActivityGauge" value="${ActivityGauge}" /> 
+					<token key="Insights" value="${Insights}" />
+					<token key="PackedBubble" value="${PackedBubble}" /> 
+					<token key="MultiSelectBox" value="${MultiSelectBox}" />
+					<token key="Analytics" value="${Analytics}" />
+					<token key="SunBurst" value="${SunBurst}" />
+					<token key="SlopeChart" value="${SlopeChart}" />
+					<token key="PeriodSelectorDWM" value="${PeriodSelectorDWM}" />
+  					<token key="GoogleMap" value="${GoogleMap}" />
+  					<token key="ESRIMap" value="${ESRIMap}" />
+					<token key="DataUtilitySource" value="${DataUtilitySource}" />
+					<token key="DataUtility" value="${DataUtility}" /> 
+					<token key="StreamGraph" value="${StreamGraph}" />
+					<token key="Sankey" value="${Sankey}" /> 
+					<token key="ParallelCoordinates" value="${ParallelCoordinates}" />		
+					<token key="ODataSource" value="${ODataSource}" />
+				    <token key="TrellisChart" value="${TrellisChart}" />
+					<token key="TimeSlicer" value="${TimeSlicer}" />
+					<token key="GanttChart" value="${GanttChart}" /> 
+					<token key="DataMerge" value="${DataMerge}" />
+					<token key="WebServiceDataSource" value="${WebServiceDataSource}" />
+					<token key="ConstantDataSource" value="${ConstantDataSource}" />
+					<token key="TreeMapDrilldown" value="${TreeMapDrilldown}" />
+					<token key="LinearGauge" value="${LinearGauge}" />
+					<token key="CustomDataSource" value="${CustomDataSource}" />
+					<token key="HierarchialFilter" value="${HierarchialFilter}" />
+					<token key="ChartSelector" value="${ChartSelector}" />
+					<token key="ChartContainer" value="${ChartContainer}" />
+					<token key="FixedColumnChart" value="${FixedColumnChart}" />
+					<token key="DualAxesChart" value="${DualAxesChart}" />
+					<token key="MultipleAxesChart" value="${MultipleAxesChart}" />
+					<token key="Table" value="${Table}" />
+					<token key="TableBeta" value="${TableBeta}" /> 
+					<token key="VBXTheme" value="${VBXTheme}" />  
+					<token key="KPITile" value="${KPITile}" />
+					<token key="AdvancedGauge" value="${AdvancedGauge}" />
+					<token key="TreeMap" value="${TreeMap}" />
+					<token key="AdvancedKPITile" value="${AdvancedKPITile}" />
+					<token key="GridBox" value="${GridBox}" />
+					<token key="ComboBox" value="${ComboBox}" />
+					<token key="DataProvider" value="${DataProvider}" />
+					<token key="IndoorAnalyzer" value="${IndoorAnalyzer}" />
+					<token key="HTMLBox" value="${HTMLBox}" />
+					<token key="ScriptBox" value="${ScriptBox}" />
+					<token key="DOCExport" value="${DOCExport}" />
+					<token key="TagCloud" value="${TagCloud}" />
+					<token key="PolarChart" value="${PolarChart}" />
+					<token key="TrendIcon" value="${TrendIcon}" />
+					<token key="RangeSlider" value="${RangeSlider}" />
+					<token key="PPTExport" value="${PPTExport}" />
+					<token key="ListBox" value="${ListBox}" />
+					<token key="Menu" value="${Menu}" />
+					<token key="ResponsiveUI" value="${ResponsiveUI}" />
+					<token key="RiskMatrixChart" value="${RiskMatrixChart}" />
+					<token key="LocationAnalyzer" value="${LocationAnalyzer}" />
+					<token key="PeriodSelectorYM" value="${PeriodSelectorYM}" />
+					<token key="PeriodSelectorYQM" value="${PeriodSelectorYQM}" />
+					<token key="PeriodSelectorYQMM" value="${PeriodSelectorYQMM}" />
+					<token key="CesiumMap" value="${CesiumMap}" /> 
+					<token key="SparkLineTableChart" value="${SparkLineTableChart}" />
+					<token key="SparkLineChart" value="${SparkLineChart}" />
+					<token key="VbiPdfExport" value="${VbiPdfExport}" />
+					<token key="Searchbox" value="${Searchbox}" />
+					<token key="LineChart" value="${LineChart}" />
+					<token key="ProgressBar" value="${ProgressBar}" />
+					<token key="StackedColumnBarChart" value="${StackedColumnBarChart}" />
+					<token key="MarimekkoChart" value="${MarimekkoChart}" />
+					<token key="ColumnBarChart" value="${ColumnBarChart}" />
+					<token key="ColumnBarChartNew" value="${ColumnBarChartNew}" />
+					<token key="BoxPlotChart" value="${BoxPlotChart}" />
+					<token key="ColumnBarDrilldownChart" value="${ColumnBarDrilldownChart}" />
+					<token key="PieChart" value="${PieChart}" />
+					<token key="SpieChart" value="${SpieChart}" />	
+					<token key="PieDrilldownChart" value="${PieDrilldownChart}" />
+					<token key="WaterfallChart" value="${WaterfallChart}" />
+					<token key="AreaChart" value="${AreaChart}" />
+					<token key="GroupStackedColumnBarChart" value="${GroupStackedColumnBarChart}" />
+					<token key="BulletChart" value="${BulletChart}" />
+					<token key="StackedAreaChart" value="${StackedAreaChart}" />
+					<token key="RadarChart" value="${RadarChart}" />
+					<token key="HCMap" value="${HCMap}" />
+					<token key="NumberCounter" value="${NumberCounter}" />
+					<token key="CircularCounter" value="${CircularCounter}" />
+					<token key="FunnelPyramidChart" value="${FunnelPyramidChart}" />
+					<token key="DonutChart" value="${DonutChart}" />
+					<token key="SemicircledonutChart" value="${SemicircledonutChart}" />
+					<token key="CombinationChart" value="${CombinationChart}" />
+					<token key="BubbleChart" value="${BubbleChart}" />
+					<token key="ScatterChart" value="${ScatterChart}" />
+					<token key="SuperCombinationChart" value="${SuperCombinationChart}" />
+					<token key="AngularGauge" value="${AngularGauge}" />
+					<token key="FunnelPyramidDrilldownChart" value="${FunnelPyramidDrilldownChart}" />
+					<token key="SolidGauge" value="${SolidGauge}" />
+					<token key="advancedlabel" value="${advancedlabel}" />
+					<token key="HeatMapChart" value="${HeatMapChart}" />
+					<token key="WhatIfAnalyzer" value="${WhatIfAnalyzer}" />
+					<token key="FacetFilter" value="${FacetFilter}" />
+					<token key="MailExport" value="${MailExport}" />
+					<token key="WaffleChart" value="${WaffleChart}" />
+					<token key="Pictogram" value="${Pictogram}" />
+					<token key="CalendarHeatmap" value="${CalendarHeatmap}" />
+					<token key="RainFallChart" value="${RainFallChart}" />
+					<token key="VennDiagram" value="${VennDiagram}" />
+					<token key="RConfiguration" value="${RConfiguration}" />
+					<token key="RScriptBox" value="${RScriptBox}" />
+					<token key="RContainer" value="${RContainer}" />
+					<token key="Chord" value="${Chord}" />
+					<token key="TimeSeries" value="${TimeSeries}" />
+				</replacetokens>
+			</filterchain>
+		</copy>
+		<delete file="config/defval.xml"/>
+		<delete file="config/jstest.xml" />
+		<delete file="config/csstest.xml" />
+		<delete file="config/contrib_component.xml" />
+	</target>
+
+	<target name="compile">
+		<echo message="${theFile}" />
+		<delete file="config/jstest.xml" />
+		<delete file="config/csstest.xml" />
+		<echo file="config/csstest.xml" > </echo>
+		<echo file="config/jstest.xml" > </echo>
+		<echo file="config/mainProp.xml" > </echo>
+		<echo file="config/addProp.xml" > </echo>
+		<property file="contribution/${theFile}.txt"/>
+
+		<var name="main.property" value="" unset="true"/>
+		<var name="additional.property" value="" unset="true"/>
+		<var name="js.Includeblock" value="" unset="true"/>
+
+		<if><not><equals arg1="${jsInclude}" arg2=""/></not><then>
+		<var name="scriptLastMod" value="${jsInclude}"/>	 
+		<for list="${jsInclude}" param="js">
+				<sequential>
+					<script language="javascript">
+						<![CDATA[
+						//script for skipping the on files 
+							var gara = project.getProperty('scriptLastMod').split(',');
+							var lastJS = gara[gara.length-1];
+							//java.lang.System.out.println( " conter & prop"+lastJS); 
+							project.setProperty('jsEntry', lastJS);
+						]]>
+					</script>
+					<propertyregex property="jsval" input="${jsEntry}" regexp="\.js" replace="" casesensitive="false" /> 
+			</sequential>
+		</for> 
+		<echo file="config/jstest.xml" append="true"><![CDATA[<requireJs modes="commons m">${jsval}</requireJs>]]></echo>
+		<if><equals arg1="${stdIncludeKind}" arg2="HC"/><then>
+		<property name="stdInclude" value=""/>
+		<echo file="config/jstest.xml" append="true"><![CDATA[]]></echo>
+		</then><else><property name="stdInclude" value="${stdIncludeKind}"/> </else></if>
+		 
+		<var name="jsval" value="" unset="true"/> 
+		<var name="jsEntry" value="" unset="true"/> 
+		<if><equals arg1="${mock}" arg2="true" /><then>
+		<echo file="config/jstest.xml" append="true"><![CDATA[<jsInclude>res/library/mockdata.js</jsInclude><jsInclude>res/library/bwdata1.js</jsInclude>]]></echo></then></if>
+		</then></if>
+		<loadfile property="js.Includeblock" srcFile="config/jstest.xml" />
+
+		<if><not><equals arg1="${cssInclude}" arg2=""/></not><then> 
+		<for list="${cssInclude}" param="css">
+			<sequential>
+				<echo file="config/csstest.xml" append="true"><![CDATA[<cssInclude>@{css}</cssInclude>]]></echo>
+			</sequential>
+		</for>
+		</then></if>
+		<loadfile property="css.Include" srcFile="config/csstest.xml" />
+
+		<propertyregex property="mainregexProp" input="${mainProperties}" regexp="(\[)|(\])" replace="" casesensitive="false" />
+		<propertyregex property="addRegexProp" input="${additionalProperties}" regexp="(\[)|(\])" replace="" casesensitive="false" />
+
+		<if><not><equals arg1="${mainProperties}" arg2=""/></not><then>
+		<var name="mainProps" value="" unset="true"/>
+		<antcall target="properties">
+			<param name="visibility" value="true" />
+			<param name="regProp" value="${mainregexProp}" />
+			<param name="propFile" value="mainProp" />
+		</antcall>
+		</then></if>
+		<loadfile property="main.property" srcFile="config/mainProp.xml" />
+		<delete file="config/mainProp.xml"/>
+
+		<if><not><equals arg1="${additionalProperties}" arg2=""/></not><then>
+		<var name="addProps" value="" unset="true"/>
+		<antcall target="properties">
+			<param name="visibility" value="false" />
+			<param name="regProp" value="${addRegexProp}" />
+			<param name="propFile" value="addProp" />
+		</antcall>
+		</then></if>
+		<loadfile property="additional.property" srcFile="config/addProp.xml" />
+		<delete file="config/addProp.xml"/>
+		<delete file="config/defval.xml"/>
+		<var name="counter" value="0"/>
+		<propertyregex property="defaultValueList" input="${defaultValue}" regexp="(\()|(\))"  replace="" casesensitive="false" />
+			<for list="${defaultValueList}" param="defval" delimiter="^">
+				<sequential>
+					<for list="@{defval}" param="values" delimiter="|">
+					<sequential>
+					<math result="counterMod" operand1="${counter}" operation="%" operand2="2" datatype="int" />
+					<math result="counter" operand1="${counter}" operation="+" operand2="1" datatype="int" />
+					<if>
+					<equals arg1="${counterMod}" arg2="0" />
+					<then>
+						<echo file="config/defval.xml" append="true"><![CDATA[<defaultValue property="@{values}">]]></echo>
+					</then>
+					<elseif>
+						<equals arg1="${counterMod}" arg2="1" />
+						<then>
+							<if>
+					         <matches string="@{values}" pattern=";"  />
+					         <then>
+					         	<propertyregex property="propFunc"
+					         	               input="@{values}"
+					         	               regexp="(;)"
+					         	               replace="" />
+					         	<echo file="config/defval.xml" append="true"><![CDATA[${propFunc}();</defaultValue>]]></echo>
+								<var name="propFunc" value="" unset="true"/>
+					        </then>
+							<else>
+								<echo file="config/defval.xml" append="true"><![CDATA[@{values}</defaultValue>]]></echo>
+							</else>
+							</if>
+						</then>
+					</elseif>
+					</if>
+					</sequential>
+					</for>
+				</sequential>
+			</for>
+			<var name="defaultValueList" value="" unset="true"/>
+			<echo file="config/shim.xml"><![CDATA[<jsInclude>res/config/shim.js</jsInclude>]]></echo>
+			<loadfile property="shim.values" srcFile="config/shim.xml" />
+		<loadfile property="default.values" srcFile="config/defval.xml" />
+		<if><equals arg1="${stdIncludeKind}" arg2="HC"/><then><property name="stdInclude" value=""/></then><else><property name="stdInclude" value="${stdIncludeKind}"/> </else></if>
+		<copy file="config/component.xml" tofile="config/contrib_component.xml" overwrite="${overwrite.files}">
+			<filterchain>
+				<replacetokens>
+					<token key="id" value="${id}" />
+					<token key="title" value="${title}" />
+					<token key="newInstancePrefix" value="${newInstancePrefix}" />
+					<token key="supportsExportContent" value="${supportsExportContent}" />
+					<token key="includeInBookmarkDialog" value="${includeInBookmarkDialog}" />
+					<token key="icon" value="${icon}" />
+					<token key="handlerType" value="${handlerType}" />
+					<token key="group" value="${group}" />
+					<token key="propertySheetPath" value="${propertySheetPath}" />
+					<token key="visible" value="${visible}" />
+					<token key="databound" value="${databound}" />
+					<token key="std.Includeblock" value="${stdInclude}" />
+					<token key="shim.Includeblock" value="${shim.values}" />
+					<token key="js.Includeblock" value="${js.Includeblock}" />
+					<token key="css.Includeblock" value="${css.Include}" />
+					<token key="main.property" value="${main.property}" />
+					<token key="additional.property" value="${additional.property}" />
+					<token key="default.values" value="${default.values}" />
+				</replacetokens>
+			</filterchain>
+		</copy>
+
+		<loadfile property="contribution.content" srcFile="config/contrib_component.xml" />
+		<echo file="config/contribs/${theFile}.xml">${contribution.content}</echo>
+	</target>
+	<target name="ztlcompile">
+		<echo message="${theFile}" />
+		<delete file="config/jstest.xml" />
+		<delete file="config/csstest.xml" />
+		<echo file="config/csstest.xml" > </echo>
+		<echo file="config/jstest.xml" > </echo>
+		<echo file="config/mainProp.xml" > </echo>
+		<echo file="config/addProp.xml" > </echo>
+		<property file="contribution/${theFile}.txt"/>
+
+		<var name="main.property" value="" unset="true"/>
+		<var name="additional.property" value="" unset="true"/>
+		<var name="js.Includeblock" value="" unset="true"/>
+
+		<if><not><equals arg1="${jsInclude}" arg2=""/></not><then>
+		<for list="${jsInclude}" param="js">
+				<sequential>
+					<echo file="config/jstest.xml" append="true"><![CDATA[<jsInclude>@{js}</jsInclude>]]>
+					</echo>
+			</sequential>
+		</for>
+		</then></if>
+		<loadfile property="js.Includeblock" srcFile="config/jstest.xml" />
+
+		<if><not><equals arg1="${cssInclude}" arg2=""/></not><then> 
+		<for list="${cssInclude}" param="css">
+			<sequential>
+				<echo file="config/csstest.xml" append="true"><![CDATA[<cssInclude>@{css}</cssInclude>]]></echo>
+			</sequential>
+		</for>
+		</then></if>
+		<loadfile property="css.Include" srcFile="config/csstest.xml" />
+
+		<propertyregex property="mainregexProp" input="${mainProperties}" regexp="(\[)|(\])" replace="" casesensitive="false" />
+		<propertyregex property="addRegexProp" input="${additionalProperties}" regexp="(\[)|(\])" replace="" casesensitive="false" />
+
+		<if><not><equals arg1="${mainProperties}" arg2=""/></not><then>
+		<var name="mainProps" value="" unset="true"/>
+		<antcall target="properties">
+			<param name="visibility" value="true" />
+			<param name="regProp" value="${mainregexProp}" />
+			<param name="propFile" value="mainProp" />
+		</antcall>
+		</then></if>
+		<loadfile property="main.property" srcFile="config/mainProp.xml" />
+		<delete file="config/mainProp.xml"/>
+
+		<if><not><equals arg1="${additionalProperties}" arg2=""/></not><then>
+		<var name="addProps" value="" unset="true"/>
+		<antcall target="properties">
+			<param name="visibility" value="false" />
+			<param name="regProp" value="${addRegexProp}" />
+			<param name="propFile" value="addProp" />
+		</antcall>
+		</then></if>
+		<loadfile property="additional.property" srcFile="config/addProp.xml" />
+		<delete file="config/addProp.xml"/>
+		<delete file="config/defval.xml"/>
+		<var name="counter" value="0"/>
+		<propertyregex property="defaultValueList" input="${defaultValue}" regexp="(\()|(\))"  replace="" casesensitive="false" />
+			<for list="${defaultValueList}" param="defval" delimiter="^">
+				<sequential>
+					<for list="@{defval}" param="values" delimiter="|">
+					<sequential>
+					<math result="counterMod" operand1="${counter}" operation="%" operand2="2" datatype="int" />
+					<math result="counter" operand1="${counter}" operation="+" operand2="1" datatype="int" />
+					<if>
+					<equals arg1="${counterMod}" arg2="0" />
+					<then>
+						<echo file="config/defval.xml" append="true"><![CDATA[<defaultValue property="@{values}">]]></echo>
+					</then>
+					<elseif>
+						<equals arg1="${counterMod}" arg2="1" />
+						<then>
+							<echo file="config/defval.xml" append="true"><![CDATA[@{values}</defaultValue>]]></echo>
+						</then>
+					</elseif>
+					</if>
+					</sequential>
+					</for>
+				</sequential>
+			</for>
+			<var name="defaultValueList" value="" unset="true"/>
+
+		<loadfile property="default.values" srcFile="config/defval.xml" />
+		<copy file="config/ztlcomponent.xml" tofile="config/contrib_component.xml" overwrite="${overwrite.files}">
+			<filterchain>
+				<replacetokens>
+					<token key="id" value="${id}" />
+					<token key="title" value="${title}" />
+					<token key="newInstancePrefix" value="${newInstancePrefix}" />
+					<token key="icon" value="${icon}" />
+					<token key="handlerType" value="${handlerType}" />
+					<token key="desc" value="${desc}" />
+					<token key="group" value="${group}" />
+					<token key="propertySheetPath" value="${propertySheetPath}" />
+					<token key="visible" value="${visible}" />
+					<token key="databound" value="${databound}" />
+					<token key="conditionalformatting" value="${conditionalformatting}" />
+					<token key="std.Includeblock" value="${stdIncludeKind}" />
+					<token key="js.Includeblock" value="${js.Includeblock}" />
+					<token key="css.Includeblock" value="${css.Include}" />
+					<token key="main.property" value="${main.property}" />
+					<token key="additional.property" value="${additional.property}" />
+					<token key="default.values" value="${default.values}" />
+				</replacetokens>
+			</filterchain>
+		</copy>
+
+		<loadfile property="contribution.content" srcFile="config/contrib_component.xml" />
+		<echo file="config/contribs/${theFile}ztl.xml">${contribution.content}</echo>
+	</target>
+
+	<target name="properties">
+		<var name="counterMod" value="0"/>
+		<var name="index" value="0"/>
+		<for list="${regProp}" param="mainPropAttr">
+			<sequential>
+				<var name="scriptMod" value="@{mainPropAttr}"/>
+
+				<for list="@{mainPropAttr}" param="propEntries">
+					<sequential>
+						<math result="counterMod" operand1="${index}" operation="%" operand2="10" datatype="int" />
+						<script language="javascript">
+						<![CDATA[
+						//script for skipping the {ztlscript} on properties
+						//	importPackage(java.lang);
+							var gar = project.getProperty('scriptMod').split(',');
+							if(project.getProperty('skipProp')=="{ztlscript}"){
+								if(project.getProperty('counterMod') == 0)
+								project.setProperty('skipProp', 'null');
+							}
+							if(gar[0]=="{ztlscript}" && project.getProperty('ztlBuild')!="true"){
+								project.setProperty('skipProp', gar[0]);
+							}
+							//System.out.println(project.getProperty('counterMod')+" conter & prop"+ project.getProperty('skipProp'));
+						]]>
+						</script>
+						<if><not><equals arg1="${skipProp}" arg2="{ztlscript}" /></not><then>
+						<if>
+								<equals arg1="${counterMod}" arg2="0" />
+								<then>
+									<propertyregex property="regexPossGroup" input="@{propEntries}" regexp="(\{)|(\})" replace="" casesensitive="false" />
+									<echo file="config/${propFile}.xml" append="true"><![CDATA[<property ]]></echo>
+									<if>
+									<not>
+										<equals arg1="${regexPossGroup}" arg2=""/>
+									  </not>
+										<then>
+									<echo file="config/${propFile}.xml" append="true"><![CDATA[group="${regexPossGroup}" ]]></echo>
+											</then>
+									</if>
+									<if><equals arg1="${ztlBuild}" arg2="true" /><then>
+										<if><equals arg1="${regexPossGroup}" arg2=""/><then>
+											<echo file="config/${propFile}.xml" append="true"><![CDATA[group="" ]]></echo>
+										</then></if>
+									</then></if>
+									<var name="regexPossGroup" value="" unset="true"/>
+								</then>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="1" />
+									<then>
+										<echo file="config/${propFile}.xml" append="true"><![CDATA[id="@{propEntries}" visible="${visibility}" ]]></echo>
+										<if>
+										<not>
+											<equals arg1="${visibility}" arg2="false"/>
+										</not>
+											<then>
+												<echo file="config/${propFile}.xml" append="true"><![CDATA[bindable="true" ]]></echo>
+											</then>
+										</if>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="2" />
+									<then>
+										<echo file="config/${propFile}.xml" append="true"><![CDATA[title="@{propEntries}" ]]></echo>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="3" />
+									<then>
+										<if>
+											<equals arg1="${ztlBuild}" arg2="false" />
+												<then>
+													<condition property="charttype"><or>
+														<equals arg1="@{propEntries}" arg2="VBXAdvancedColumnChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXContextMenuEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXPageSizeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXAreaChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXWaterfallChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXDualAxesChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXLineChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXColumnChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXCombinationChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXDonutChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXFunnelChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXFunnelDrillDownChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXPieChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXSemiCircleDonutChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXGroupStackedColumnBarChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXStackedColumnBarChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXStackedAreaChartTypeEnumfield" />
+														<equals arg1="@{propEntries}" arg2="VBXLayerTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXSuppressionOnTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXSuppressionTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXAggregationTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXRangeTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXPeriodTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXOperatorTypeEnumfield"/>
+														<equals arg1="@{propEntries}" arg2="VBXGaugePlotBandTypeEnumfield"/> 
+														<equals arg1="@{propEntries}" arg2="VBXThemeEnumfield"/>
+													</or></condition>
+													<if>
+														<equals arg1="${charttype}" arg2="true" />
+														<then>
+															<echo file="config/${propFile}.xml" append="true"><![CDATA[type="String" ]]></echo>
+														</then>
+														<else>
+															<echo file="config/${propFile}.xml" append="true"><![CDATA[type="@{propEntries}" ]]></echo>
+														</else>
+													</if>
+												</then>
+										<elseif><equals arg1="${ztlBuild}" arg2="true" /><then><echo file="config/${propFile}.xml" append="true"><![CDATA[type="@{propEntries}" ]]></echo></then></elseif></if>
+										<var name="charttype" value="false" unset="true"/>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="4" />
+									<then>
+										<if><equals arg1="${ztlBuild}" arg2="false" /><then><echo file="config/${propFile}.xml" append="true"><![CDATA[>]]></echo></then>
+										<elseif><equals arg1="${ztlBuild}" arg2="true" /><then><echo file="config/${propFile}.xml" append="true"><![CDATA[setter="@{propEntries}" ]]></echo></then></elseif></if>
+										<condition property="customsetter"><equals arg1="@{propEntries}" arg2="true"/></condition>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="5" />
+									<then>
+										<if><equals arg1="${ztlBuild}" arg2="true" /><then><echo file="config/${propFile}.xml" append="true"><![CDATA[getter="@{propEntries}" ]]></echo></then></if>
+										<if>
+											<equals arg1="${customsetter}" arg2="true" />
+											<then>
+												<echo file="config/${propFile}.xml" append="true"><![CDATA[type="@{propEntries}" ]]></echo>
+											</then>
+										</if>
+										<var name="customsetter" value="false" unset="true"/>
+
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="6" />
+									<then>
+										<if><equals arg1="${ztlBuild}" arg2="true" /><then><echo file="config/${propFile}.xml" append="true"><![CDATA[defval="@{propEntries}">]]></echo></then></if>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="7" />
+									<then>
+										<propertyregex property="regexPoss" input="@{propEntries}" regexp="(\()|(\))" replace="" casesensitive="false" />
+
+										<for list="${regexPoss}" param="possibleVal" delimiter="|">
+											<sequential>
+												<echo file="config/${propFile}.xml" append="true"><![CDATA[<possibleValue>@{possibleVal}</possibleValue>]]></echo>
+										</sequential>
+									</for>
+										<var name="regexPoss" value="" unset="true"/>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="8" />
+									<then>
+										<if>
+											<not>
+												<equals arg1="@{propEntries}" arg2="false"/>
+										  	</not>
+											<then>
+													<propertyregex property="regexPoss" input="@{propEntries}" regexp="|" replace="" casesensitive="false" /> 
+													<var name="optindex" value="0"/>
+ 													<for list="${regexPoss}" param="optval" delimiter="|">
+														<sequential>
+															<property name="var${optindex}" value="@{letter}" />
+															<math result="optindex" operand1="${optindex}" operation="+" operand2="1" datatype="int" />
+															<math result="modoptindex" operand1="${optindex}" operation="%" operand2="2" datatype="int" />
+															 <if><equals arg1="${modoptindex}" arg2="1" /><then>
+															<echo file="config/${propFile}.xml" append="true"><![CDATA[<option name="@{optval}" ]]></echo>
+															</then></if>
+															 <if><equals arg1="${modoptindex}" arg2="0" /><then>
+															<echo file="config/${propFile}.xml" append="true"><![CDATA[value="@{optval}"/>]]></echo>
+															</then></if>
+														</sequential>
+													</for>
+													<var name="regexPoss" value="" unset="true"/>
+													<var name="optindex" value="" unset="true"/> 
+											</then>
+										</if>
+									</then>
+								</elseif>
+								<elseif>
+									<equals arg1="${counterMod}" arg2="9" />
+									<then>
+										<if>
+											<not>
+												<equals arg1="@{propEntries}" arg2="notused"/>
+										  	</not>
+											<then>   
+												<!-- count of </property> tags 0 to n -->
+											<property name="propertyTimes" value="@{propEntries}" />
+												 <script language="javascript"><![CDATA[ 
+												var n=parseInt(project.getProperty("propertyTimes"),10);
+												project.setProperty("times",n);
+												for(var i = 0; i < n; i++) { 
+												project.executeTarget("callee");
+												} 
+												]]></script>  
+												<var name="propertyTimes" value="" unset="true"/>
+											</then> 
+											<elseif>
+												<equals arg1="@{propEntries}" arg2="notused"/>
+												<then>
+													<echo file="config/${propFile}.xml" append="true"><![CDATA[</property>]]></echo>
+												</then>
+											</elseif>
+										</if>
+									</then>
+								</elseif>
+							  </if>
+						 </then></if>
+						<math result="index" operand1="${index}" operation="+" operand2="1" datatype="int" />
+					</sequential>
+				</for> 
+			</sequential>
+		</for>
+		<echo file="config/${propFile}.xml" append="true">
+			<![CDATA[]]></echo>
+	</target>
+	
+	<target name="callee">
+		<echo file="config/${propFile}.xml" append="true"><![CDATA[</property>]]></echo>
+	</target>
+<!-- private -->
+  <macrodef name="do_concat">
+    <attribute name="source"/>
+    <attribute name="destination"/>
+    <sequential>
+      <concat destfile="@{destination}" append="yes">
+        <fileset file="@{source}" />
+      </concat>
+    </sequential>
+  </macrodef>
+<scriptdef name="convertToLowerCase" language="javascript" >
+	<attribute name="property" />
+	<attribute name="value"    />
+	project.setNewProperty( attributes.get("property"), attributes.get("value").toLowerCase() );
+</scriptdef>
+<taskdef resource="net/sf/antcontrib/antlib.xml">
+<classpath>
+	<fileset dir="libs" />
+</classpath>
+</taskdef>
+<taskdef name="if-contrib" classname="net.sf.antcontrib.logic.IfTask" classpath="libs/ant-contrib-1.0b3.jar" />
+<taskdef name="for-contrib" classname="net.sf.antcontrib.logic.ForTask" classpath="libs/ant-contrib-1.0b3.jar" />
+<taskdef name="var-contrib" classname="net.sf.antcontrib.property.Variable" classpath="libs/ant-contrib-1.0b3.jar" />
+</project>

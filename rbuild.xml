@@ -1,0 +1,16 @@
+<project default="run" basedir="ubs">
+    <loadproperty file="../properties.xml" />
+    <target name="run">
+        <property name="authorname" />
+        <condition property="authorname">
+            <operation type="eq" arg1="" arg2="" />
+        </condition>
+        <condition property="authorname">
+            <and>
+                <operation type="gt" arg1="" arg2="" />
+                <operation type="lt" arg1="" arg2="" />
+            </and>
+        </condition>
+        <echo>${authorname}</echo>
+    </target>
+</project>
