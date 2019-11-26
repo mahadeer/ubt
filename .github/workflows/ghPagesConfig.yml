@@ -23,6 +23,6 @@ jobs:
     - name: Deploying to GitHub Pages
       uses: crazy-max/ghaction-github-pages@v1.2.5
       with:
-        build_dir: /docz/dist
+        build_dir: .docz/dist
       env:
         GITHUB_PAT: ${{ secrets.GITHUB_PAT }}  
