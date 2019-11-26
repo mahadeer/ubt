@@ -3,7 +3,7 @@ name: Publishing Docs to Github Pages
 on:
   push:
     branches: 
-      - docz-dev
+      - 'docz-dev'
 
 jobs:
   build:
