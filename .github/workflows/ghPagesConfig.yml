@@ -19,6 +19,7 @@ jobs:
     - name: Install Dependencies
       run: npm install
     - name: Build Project
+      run: npm run make
       run: npm run build
     - name: Deploying to GitHub Pages
       uses: crazy-max/ghaction-github-pages@v1.2.5

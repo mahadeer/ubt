@@ -7,8 +7,8 @@ menu: {menu}
 import { ContentLayout } from "../layout/ContentLayout";
 
 <ContentLayout 
-    title="{title}" description="{description}"
-    syntax="{syntax}" properties={JSON.stringify(properties)}
-    examples={JSON.stringify(examples)} requires={JSON.stringify(requires)}
-    related={JSON.stringify(related)}
+    title='{title}' description='{description}'
+    syntax='{syntax}' properties='{properties}'
+    examples='{examples}' requires='{requires}'
+    related='{related}'
     />

@@ -43,8 +43,8 @@ export const ContentLayout = (props) => {
                     <div className="example" key={idx}>
                         <p>{example.description}</p>
                         <div className="example-code"><XMLViewer xml={example.content} theme={xmlCustomTheme}></XMLViewer></div>
-                        {example.note != "" ? <p className="example-note">Note: {example.note}</p> : null}
-                        {idx != examples.length - 1 ? <hr /> : null}
+                        {example.note !== "" ? <p className="example-note">Note: {example.note}</p> : null}
+                        {idx !== examples.length - 1 ? <hr /> : null}
                     </div>
                 ))
             }
@@ -55,7 +55,7 @@ export const ContentLayout = (props) => {
                 <ul className="require-list">
                     {
                         requires.map((req, idx) => (
-                            <li><a href={req.route}>{req.text}</a></li>
+                            <li key={req.text}><a href={req.route}>{req.text}</a></li>
                         ))
                     }
                 </ul>
@@ -67,7 +67,7 @@ export const ContentLayout = (props) => {
                 <ul className="reference-list">
                     {
                         related.map((rel, idx) => (
-                            <li><a href={rel.route}>{rel.text}</a></li>
+                            <li key={rel.text}><a href={rel.route}>{rel.text}</a></li>
                         ))
                     }
                 </ul>

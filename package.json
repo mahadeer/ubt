@@ -11,7 +11,8 @@
   "scripts": {
     "dev": "docz dev",
     "build": "docz build",
-    "serve": "docz serve"
+    "serve": "docz serve",
+    "make": "node src/_build/build.js"
   },
   "dependencies": {
     "docz": "next",
