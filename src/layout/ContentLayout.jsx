@@ -36,6 +36,10 @@ export const ContentLayout = (props) => {
                 </tbody>
             </table>
         </div>
+        <div className="syntax">
+            <h3>Syntax</h3>
+            <div className="example-code"><XMLViewer xml={props.syntax} theme={xmlCustomTheme}></XMLViewer></div>
+        </div>
         <div className="examples">
             <h3>Examples</h3>
             {
