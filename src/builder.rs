@@ -4,7 +4,7 @@ use crate::tasks;
 use crate::utils;
 use roxmltree::Node;
 use std::collections::HashMap;
-
+use std::io::Write;
 
 pub fn build_project(&project: &Node, log: &logger::Logger) {
     let default = project.attribute("default").unwrap_or("");
@@ -36,10 +36,28 @@ fn build_target(
     for element in elements {
         match element.tag_name().name() {
             "echo" => {
-                println!(
-                    "\t[echo] {}",
-                    utils::get_text(element.text().unwrap_or(""), &properties_hash)
-                );
+                let message = utils::get_text(element.text().unwrap_or(""), &properties_hash);
+                if element.has_attribute("file") {
+                    let filename =
+                        utils::get_text(element.attribute("file").unwrap_or(""), &properties_hash);
+                    if filename != "" {
+                        let file_path = std::path::Path::new(
+                            properties_hash.get("__project__basedir").unwrap(),
+                        )
+                        .join(filename.clone());
+                        let mut file_mode =
+                            std::fs::File::create(file_path).expect("Unable to create file!");
+                        match file_mode.write_all(message.as_bytes()) {
+                            Ok(f) => f,
+                            Err(_e) => {
+                                log.build_failed(format!("{} not found", filename));
+                                std::process::exit(0);
+                            }
+                        };
+                    }
+                } else {
+                    println!("\t[echo] {}", message);
+                }
             }
             "perform" => {
                 let task_fn: fn(

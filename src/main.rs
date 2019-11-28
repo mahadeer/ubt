@@ -8,8 +8,10 @@ mod utils;
 mod builder;
 mod tasks;
 
+use std::env;
+
 fn main() {
-    let build_path = "rbuild.xml";
+    let build_path: &str = &env::args().nth(1).expect("Build path xml must be provided");
     let log = logger::Logger::new();
     log.log(format!("\nBuildfile: {:?} \n", build_path));
     utils::get_xml_doc(
