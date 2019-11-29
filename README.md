@@ -27,3 +27,14 @@ $ git clone  https://github.com/mahadeer/ubs.git
 $ cd ubs
 $ cargo run 'C:/somewhere/build.xml'
 ```
+## Contributing
+Please refer [Contribute](https://mahadeer.github.io/ubs/contribute) for details on our code of conduct, and the process for submitting pull requests to us.
+
+## Versioning
+We use SemVer for versioning. Version released can be found on the release tags.
+
+## Authors
+[Mahadeer Mohamed](https://mahadeer.github.io/)
+
+## License
+This project is licensed under the MIT License - see the [Usage](https://mahadeer.github.io/ubs/usage-policy) file for details
