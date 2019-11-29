@@ -1,0 +1,6 @@
+<project default="main" basedir="ubs">
+    <target name="main">
+        <property name="appName" value="UBS"/>
+        <echo>Hello, World by ${appName}</echo>
+    </target>
+</project>
