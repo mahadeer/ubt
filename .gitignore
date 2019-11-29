@@ -1,3 +1,4 @@
 .docz
 node_modules
 src/reference/*.mdx
+src/_build/public/JSONForm/dist

@@ -12,7 +12,8 @@
     "dev": "docz dev",
     "build": "docz build",
     "serve": "docz serve",
-    "make": "node src/_build/build.js"
+    "make": "node src/_build/build.js",
+    "docs": "node src/_build/server.js"
   },
   "dependencies": {
     "docz": "next",
@@ -20,5 +21,9 @@
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-xml-viewer": "^1.0.3"
+  },
+  "devDependencies": {
+    "@hapi/hapi": "^18.4.0",
+    "inert": "^5.1.3"
   }
 }

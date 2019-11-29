@@ -28,7 +28,7 @@ export const ContentLayout = (props) => {
                             <tr key={prop.key}>
                                 <td>{prop.key}</td>
                                 <td dangerouslySetInnerHTML={{ __html: prop.description }}></td>
-                                <td>{prop.possibleValues.join(", ")}<br />Default is {prop.default}</td>
+                                <td>{prop.possibleValues}<br />Default is {prop.default}</td>
                                 <td>{prop.required}</td>
                             </tr>
                         ))

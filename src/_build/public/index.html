@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>UBS Docs Swagger</title>
+    <!-- UIkit CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@3.2.3/dist/css/uikit.min.css" />
+</head>
+
+<body>
+    <div uk-sticky="media: 960" class="uk-navbar-container tm-navbar-container uk-sticky uk-sticky-fixed"
+        style="position: fixed; top: 0px; width: 1179px;">
+        <div class="uk-container uk-container-expand uk-background-secondary">
+            <nav class="uk-navbar uk-light">
+                <div class="uk-navbar-center">
+                    <a href="/" class="uk-navbar-item uk-logo">
+                        Unified Build System Document Swagger
+                    </a>
+                </div>
+            </nav>
+        </div>
+    </div>
+    <div class="tm-sidebar-left uk-visible@m">
+        <button id="addTopic" class="uk-width-1-1 uk-button-primary uk-button-small">Add Topic</button>
+        <h3>References</h3>
+        <ul class="uk-nav uk-nav-default tm-nav" id="ref-list"></ul>
+    </div>
+
+    <div class="tm-main uk-section uk-section-default">
+        <div class="uk-container uk-container-small uk-position-relative" id="content"></div>
+    </div>
+
+    <!-- UIkit JS -->
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.2.3/dist/js/uikit.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/uikit@3.2.3/dist/js/uikit-icons.min.js"></script>
+    <script src="/JSONFormApp.js"></script>
+
+    <script>
+        var jsonForm = null;
+        window.onload = function () {
+            GetReferences();
+            var addTopic = document.getElementById("addTopic");
+            addTopic.onclick = function () {
+                var content$ = document.getElementById("content");
+                if (jsonForm != null) {
+                    jsonForm.$destroy();
+                    content$.innerHTML = "";
+                }
+                jsonForm = new JSONForm({
+                    target: content$,
+                    props: {
+                        name: "",
+                        title: "",
+                        menu: "",
+                        description: "",
+                        syntax: "",
+                        properties: [],
+                        examples: [],
+                        requires: [],
+                        related: []
+                    }
+                });
+            }
+        }
+
+        function GetReferences() {
+            var elem$ = document.getElementById("ref-list");
+            elem$.innerHTML = "";
+            fetch("/references")
+                .then(function (response) {
+                    if (!response.ok) {
+                        throw Error(response.statusText);
+                    }
+                    return response.json();
+                })
+                .then(function (references) {
+                    references.forEach(function (reference) {
+                        var listItem$ = document.createElement("li");
+                        var link$ = document.createElement("a");
+                        link$.setAttribute("href", "javascript:void(0)");
+                        link$.setAttribute("class", "link-item");
+                        link$.setAttribute("data-item", reference);
+                        link$.onclick = OnItemClick;
+                        link$.textContent = reference;
+                        listItem$.appendChild(link$);
+                        elem$.appendChild(listItem$);
+                    });
+                })
+                .catch(function (err) {
+                    console.error(err);
+                });
+        }
+
+        function OnItemClick(event) {
+            var content$ = document.getElementById("content");
+            if (jsonForm != null) {
+                jsonForm.$destroy();
+                content$.innerHTML = "";
+            }
+            var item = event.target.dataset["item"];
+            if (item && item != "") {
+                fetch("/reference/" + item)
+                    .then(function (response) {
+                        if (!response.ok) {
+                            throw Error(response.statusText);
+                        }
+                        return response.json();
+                    })
+                    .then(function (docData) {
+                        jsonForm = new JSONForm({
+                            target: document.getElementById("content"),
+                            props: docData
+                        });
+                    })
+                    .catch(function (err) {
+                        console.error(err);
+                    });
+            }
+        }
+    </script>
+
+    <style>
+        .tm-sidebar-left {
+            position: fixed;
+            top: 80px;
+            bottom: 0;
+            box-sizing: border-box;
+            width: 240px !important;
+            padding: 40px 40px 60px 40px;
+            border-right: 1px #e5e5e5 solid;
+            overflow: auto
+        }
+
+        @media (min-width:960px) {
+            .tm-sidebar-left+.tm-main {
+                padding-left: 240px;
+            }
+        }
+
+        #ref-list {
+            text-transform: uppercase;
+        }
+
+        #ref-list:empty:after {
+            content: 'Loading..';
+        }
+
+        #content:empty:after {
+            content: "Select any reference to edit or click on Add Topic";
+            font-size: large;
+        }
+    </style>
+</body>
+
+</html>
