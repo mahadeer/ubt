@@ -19,9 +19,36 @@ pub fn build_project(&project: &Node, log: &logger::Logger) {
             project.attribute("basedir").unwrap_or("").to_owned(),
         );
         get_properties(&project, &mut properties_hash, log);
-        for target in targets {
-            build_target(&target, &mut properties_hash.clone(), log);
+        resolve_target(&project, &targets, &mut properties_hash.clone(), log);
+    }
+}
+
+fn resolve_target(
+    project: &Node,
+    targets: &Vec<Node>,
+    properties_hash: &mut HashMap<String, String>,
+    log: &logger::Logger,
+) {
+    for target in targets {
+        if target.has_attribute("depends") {
+            let mut dependencies: Vec<&str> =
+                target.attribute("depends").unwrap().rsplit(",").collect();
+            dependencies.reverse();
+            for dependency in dependencies {
+                let dependency_targets: Vec<Node> = project
+                    .children()
+                    .filter(|n| n.is_element() && n.attribute("name").unwrap_or("") == dependency)
+                    .collect();
+                resolve_target(
+                    &project,
+                    &dependency_targets,
+                    &mut properties_hash.clone(),
+                    log,
+                );
+            }
+
         }
+        build_target(&target, &mut properties_hash.clone(), log);
     }
 }
 

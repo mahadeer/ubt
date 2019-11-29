@@ -1,8 +1,19 @@
 Some random string from the text file
 To do:
+    * Condition
+    * for each
+    * do concat
+    * for
+    * if not then
+    * resolve (antcall)
+
+
+[20-09-2019]
+Some random string from the text file
+To do:
     * Refactor as modules
         * Task as module - Completed
         * Logging module - Completed
     * Copy, Move - Completed (without fileset)
     * Exec - Completed
-    * Depends
+    * Depends - Completed

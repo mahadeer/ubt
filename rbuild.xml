@@ -1,16 +1,14 @@
 <project default="run" basedir="ubs">
     <loadproperty file="../properties.xml" />
-    <target name="run">
-        <property name="authorname" />
-        <condition property="authorname">
-            <operation type="eq" arg1="" arg2="" />
+    <target name="run" depends="simple1">
+        <condition property="isEqual" type="and">
+            <operation type="eq" arg1="25" arg2="25" />
+            <operation type="eq" arg1="agee" arg2="age" />
         </condition>
-        <condition property="authorname">
-            <and>
-                <operation type="gt" arg1="" arg2="" />
-                <operation type="lt" arg1="" arg2="" />
-            </and>
-        </condition>
+        <echo>isEqual - ${isEqual}</echo>
+        <echo>${authorname}</echo>
+    </target>
+    <target name="simple1">
         <echo>${authorname}</echo>
     </target>
 </project>
