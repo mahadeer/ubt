@@ -43,7 +43,14 @@ pub fn create_task<'a, 'b>(
         .attribute("type")
         .expect("type of condition required")
     {
-        "and" => false,
+        "and" => {
+            let true_count: Vec<bool> = results.clone().into_iter().filter(|&n| n).collect();
+            true_count.len() == results.len()
+        },
+        "or" => {
+            let true_count: Vec<bool> = results.into_iter().filter(|&n| n).collect();
+            true_count.len() > 0
+        },
         _ => false,
     };
     format!("{}", result)
