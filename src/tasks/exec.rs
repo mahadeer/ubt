@@ -6,8 +6,8 @@ use std::io::prelude::*;
 use std::process::{Command, Stdio};
 pub fn create_task<'a, 'b>(
     element: &roxmltree::Node<'a, 'b>,
-    _log: &logger::Logger,
-    properties_hash: &std::collections::HashMap<String, String>,
+    log: &logger::Logger,
+    properties_hash: &mut std::collections::HashMap<std::string::String, std::string::String>,
 ) {
     let mut args: Vec<String> = element
         .children()
@@ -19,6 +19,8 @@ pub fn create_task<'a, 'b>(
         "executable"
     } else if element.has_attribute("cmd") {
         "cmd"
+    } else if element.has_attribute("block") {
+        "block"
     } else {
         ""
     } {
@@ -61,6 +63,9 @@ pub fn create_task<'a, 'b>(
             for line in stdout_lines {
                 println!("{}", line.unwrap());
             }
+        },
+        "block" => {
+            utils::get_properties(&element, properties_hash, &log);
         }
         _ => {}
     };

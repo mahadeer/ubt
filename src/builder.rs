@@ -23,19 +23,21 @@ pub fn build_project(&project: &Node, log: &logger::Logger) {
             "__project__basedir".to_owned(),
             project.attribute("basedir").unwrap_or("").to_owned(),
         );
-        get_properties(&project, &mut properties, log);
+        utils::get_properties(&project, &mut properties, log);
+        let mut blocks: HashMap<String, Node> = HashMap::new();
         // Get blocks from the Blocks node
         let blocks_node: Vec<Node> = project
             .children()
             .filter(|n| n.is_element() && n.tag_name().name() == "blocks")
             .collect();
-        let mut blocks: HashMap<String, Node> = HashMap::new();
-        blocks_node[0].children().for_each(|block| {
-            if block.tag_name().name() == "block" {
-                let block_name = block.attribute("name").expect("blocks must have a name");
-                blocks.insert(format!("{}", block_name), block);
-            }
-        });
+        if blocks_node.len() > 0 {
+            blocks_node[0].children().for_each(|block| {
+                if block.tag_name().name() == "block" {
+                    let block_name = block.attribute("name").expect("blocks must have a name");
+                    blocks.insert(format!("{}", block_name), block);
+                }
+            });
+        }
         // Get blocks defined globally
         project
             .children()
@@ -99,7 +101,7 @@ fn build_target(
     log: &logger::Logger,
 ) {
     println!("{}:", target.attribute("name").unwrap());
-    get_properties(&target, properties, log);
+    utils::get_properties(&target, properties, log);
     let elements: Vec<Node> = target.children().filter(|n| n.is_element()).collect();
     for element in elements {
         match element.tag_name().name() {
@@ -169,65 +171,14 @@ fn build_target(
                 }
             }
             "exec" => {
-                tasks::exec::create_task(&element, &log, &properties);
+                tasks::exec::create_task(&element, &log, properties);
+                if element.has_attribute("block") {
+                    let block_name = element.attribute("block").unwrap_or_default();
+                    let block = blocks.get(block_name).unwrap();
+                    build_target(&block, &mut properties.clone(), &mut blocks.clone(), &log);
+                }
             }
             _ => {}
-        }
-    }
-}
-
-fn get_properties(
-    &project: &Node,
-    properties_hash: &mut HashMap<String, String>,
-    log: &logger::Logger,
-) {
-    let properties_sheet: Vec<Node> = project
-        .children()
-        .filter(|n| n.is_element() && n.has_tag_name("loadproperty"))
-        .collect();
-    if properties_sheet.len() > 0 {
-        for sheet in properties_sheet {
-            let sheet_name = sheet.attribute("file").unwrap_or("");
-            if sheet_name == "" {
-                log.build_failed(String::from("Load Property file name cannot be empty"));
-                std::process::exit(0);
-            }
-            let path = std::path::Path::new(properties_hash.get("__project__basedir").unwrap())
-                .join(sheet_name);
-            utils::get_xml_doc(path, &log, |sheet: roxmltree::Document| {
-                get_properties(&sheet.root_element(), properties_hash, log);
-            });
-        }
-    }
-    let properties: Vec<Node> = project
-        .children()
-        .filter(|n| n.is_element() && n.has_tag_name("property"))
-        .collect();
-    for property in properties {
-        match property.attribute("type").unwrap_or("") {
-            "file" => {
-                let filename = property.attribute("value").unwrap_or("");
-                let file_path =
-                    std::path::Path::new(properties_hash.get("__project__basedir").unwrap())
-                        .join(filename.clone());
-                let contents = match std::fs::read_to_string(file_path) {
-                    Ok(f) => f,
-                    Err(_e) => {
-                        log.build_failed(format!("{} not found", filename));
-                        std::process::exit(0);
-                    }
-                };
-                properties_hash.insert(
-                    String::from(property.attribute("name").unwrap_or("")),
-                    contents,
-                );
-            }
-            _ => {
-                properties_hash.insert(
-                    String::from(property.attribute("name").unwrap_or("")),
-                    String::from(property.attribute("value").unwrap_or("")),
-                );
-            }
         }
     }
 }
