@@ -11,7 +11,11 @@ pub fn build_project(&project: &Node, log: &logger::Logger) {
     if project.has_attribute("default") && default != "" {
         let targets: Vec<Node> = project
             .children()
-            .filter(|n| n.is_element() && n.attribute("name").unwrap_or("") == default)
+            .filter(|n| {
+                n.is_element()
+                    && n.tag_name().name() != "blocks"
+                    && n.attribute("name").unwrap_or("") == default
+            })
             .collect();
         let mut properties_hash = HashMap::new();
         properties_hash.insert(
@@ -19,6 +23,15 @@ pub fn build_project(&project: &Node, log: &logger::Logger) {
             project.attribute("basedir").unwrap_or("").to_owned(),
         );
         get_properties(&project, &mut properties_hash, log);
+        let blocks_node: Vec<Node> = project
+            .children()
+            .filter(|n| n.is_element() && n.tag_name().name() == "blocks")
+            .collect();
+        let mut BLOCKS: HashMap<String, Node> = HashMap::new();
+        blocks_node[0].children().for_each(|block| {
+            let block_name = block.attribute("name").expect("blocks must have a name");
+            BLOCKS.insert(format!("{}", block_name), block);
+        });
         resolve_target(&project, &targets, &mut properties_hash.clone(), log);
     }
 }
@@ -46,7 +59,6 @@ fn resolve_target(
                     log,
                 );
             }
-
         }
         build_target(&target, &mut properties_hash.clone(), log);
     }
@@ -101,6 +113,13 @@ fn build_target(
                     }
                 };
                 task_fn(&element, &log, &properties_hash);
+            }
+            "condition" => {
+                let result = tasks::condition::create_task(&element, &log, &properties_hash);
+                let property = element
+                    .attribute("property")
+                    .expect("missing property in condition");
+                properties_hash.insert(property.to_string(), result);
             }
             "exec" => {
                 tasks::exec::create_task(&element, &log, &properties_hash);
