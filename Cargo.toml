@@ -1,8 +1,10 @@
 [package]
-name = "ubs"
-version = "0.1.0"
+name = "ubt"
+description = "Unified Build Tool is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBS tool requires a valid XML configuration in UBS required format."
+version = "0.2.0"
 authors = ["mahadeer13 <mahadeer2010@gmail.com>"]
-edition = "2018"
+edition = "2019"
+documentation = "https://mahadeer.github.io/ubt"
 
 [dependencies]
 roxmltree = "0.6.1"
