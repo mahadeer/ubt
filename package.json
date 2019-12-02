@@ -16,7 +16,7 @@
     "docs": "node src/_build/server.js"
   },
   "dependencies": {
-    "docz": "next",
+    "docz": "2.0.0-rc.76",
     "prop-types": "^15.7.2",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
