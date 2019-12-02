@@ -9,20 +9,20 @@ route: /hello-world
 <project default="main" basedir="C:\somefolder\">
     <property name="appVersion" value="0.1"/>
     <target name="main">
-        <property name="appName" value="UBS"/>
+        <property name="appName" value="UBT"/>
         <echo file="${appName}.txt">Hello, World by ${appName} (${appVersion})</echo>
     </target>
 </project>
 ```
 
 ### Explaination
-Create a file name defined in the **property** tag and write the contents inside the **echo** tag to the file. **basedir** is the directry on which the build.xml run, any operation done by ubs will result in the **basedir**
+Create a file name defined in the **property** tag and write the contents inside the **echo** tag to the file. **basedir** is the directry on which the build.xml run, any operation done by ubt will result in the **basedir**
 
 1. **property** created inside a **target** is scoped inside the **target** only, can't be used outside **target** and also any **property** created on the root can be used anywhere.
 2. **property** created globally can be overwritten inside **target**, but changes works only insied changed **target**.
 
 ### Related
-- [project] (https://mahadeer.github.io/ubs/project)
-- [target] (https://mahadeer.github.io/ubs/target)
-- [property] (https://mahadeer.github.io/ubs/property)
-- [echo] (https://mahadeer.github.io/ubs/echo)
+- [project] (https://mahadeer.github.io/ubt/project)
+- [target] (https://mahadeer.github.io/ubt/target)
+- [property] (https://mahadeer.github.io/ubt/property)
+- [echo] (https://mahadeer.github.io/ubt/echo)

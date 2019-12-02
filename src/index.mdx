@@ -5,15 +5,15 @@ route: /
 
 > *Documentation for v0.1*
 
-## Unified Build System (UBS)
-UBS is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBS tool requires a valid XML configuration in UBS required format. 
+## Unified Build Tool (UBT)
+UBT is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBT tool requires a valid XML configuration in UBT required format. 
 
-UBS is written in [Rust](https://www.rust-lang.org/), so it gives us more advantage on the operating system. One source code will be used across all different operating system, Rust will handle the internal while you compile the source code. UBS will not override any permission set by the operating system, it is preferred for security reasons.
+UBT is written in [Rust](https://www.rust-lang.org/), so it gives us more advantage on the operating system. One source code will be used across all different operating system, Rust will handle the internal while you compile the source code. UBT will not override any permission set by the operating system, it is preferred for security reasons.
 
-UBS has a number of built-in tasks which will can be used in the build file to simply all the tasks. Please refer to the Tutorial or Reference to explore all the availbel build-in tasks. UBS can be used in any number of ways depending on the project requirement. There are few limitations known as we develop, but will be removed in the future releases.
+UBT has a number of built-in tasks which will can be used in the build file to simply all the tasks. Please refer to the Tutorial or Reference to explore all the availbel build-in tasks. UBT can be used in any number of ways depending on the project requirement. There are few limitations known as we develop, but will be removed in the future releases.
 
 ## When to use?
-The main known usage of UBS can be,
+The main known usage of UBT can be,
  - Automation Build
  - Production Deployment
  - Execute commands
@@ -24,8 +24,8 @@ The main known usage of UBS can be,
 ## How to install?
 We are not there yet. Please clone the repo and run from build. Make sure Rust is installed on the local system.
 ```
-$ git clone  https://github.com/mahadeer/ubs.git
-$ cd ubs
+$ git clone  https://github.com/mahadeer/ubt.git
+$ cd ubt
 $ cargo run 'C:/somewhere/build.xml'
 ```
 ## Basic Setup
@@ -35,13 +35,13 @@ Please follow these steps to create a simple hello world task,
 ```xml
 <project default="main">
     <target name="main">
-        <property name="appName" value="UBS"/>
+        <property name="appName" value="UBT"/>
         <echo>Hello, World by ${appName}</echo>
     </target>
 </project>
 ```
 2. Save the file and copy the location of the file including file name and extension.
-3. Go to the UBS cloned directory and give the following
+3. Go to the UBT cloned directory and give the following
 ```
 $ cargo run C:\somehwere\build.xml
 ```
@@ -49,7 +49,7 @@ $ cargo run C:\somehwere\build.xml
 ```
 Buildfile: "C:\somehwere\build.xml"
 main:
-     [echo] Hello, World by UBS
+     [echo] Hello, World by UBT
 BUILD SUCCESSFUL
 Total Time: 3.5253ms
 ```
@@ -58,7 +58,7 @@ Total Time: 3.5253ms
 *Note: Please refer to the reference section for more explaination.*
 
 ## Contributing
-Please refer [Contribute](https://mahadeer.github.io/ubs/contribute) for details on our code of conduct, and the process for submitting pull requests to us.
+Please refer [Contribute](https://mahadeer.github.io/ubt/contribute) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 We use SemVer for versioning. Version released can be found on the release tags.
@@ -67,4 +67,4 @@ We use SemVer for versioning. Version released can be found on the release tags.
 [Mahadeer Mohamed](https://mahadeer.github.io/)
 
 ## License
-This project is licensed under the MIT License - see the [Usage](https://mahadeer.github.io/ubs/usage-policy) file for details
+This project is licensed under the MIT License - see the [Usage](https://mahadeer.github.io/ubt/usage-policy) file for details
