@@ -1,6 +1,6 @@
-<project default="main" basedir="E:\Rust\ubs\references\echo\">
+<project default="main" basedir="E:\Rust\ubt\references\echo\">
     <target name="main">
-        <property name="appName" value="UBS"/>
+        <property name="appName" value="UBT"/>
         <echo file="${appName}.txt">Hello, World by ${appName}</echo>
     </target>
 </project>

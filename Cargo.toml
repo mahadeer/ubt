@@ -1,6 +1,6 @@
 [package]
 name = "ubt"
-description = "Unified Build Tool is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBS tool requires a valid XML configuration in UBS required format."
+description = "Unified Build Tool is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBT tool requires a valid XML configuration in UBT required format."
 version = "0.2.0"
 authors = ["mahadeer13 <mahadeer2010@gmail.com>"]
 edition = "2019"

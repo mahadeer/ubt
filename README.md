@@ -1,18 +1,18 @@
 # Unified Build Tool
 
-> **Please refer to [Docs](https://mahadeer.github.io/ubs/) here.**
+> **Please refer to [Docs](https://mahadeer.github.io/ubt/) here.**
 
 > *Documentation for v0.1*
 
 ## Getting Started
-UBT is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBS tool requires a valid XML configuration in UBS required format. 
+UBT is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBT tool requires a valid XML configuration in UBT required format. 
 
-UBT is written in [Rust](https://www.rust-lang.org/), so it gives us more advantage on the operating system. One source code will be used across all different operating system, Rust will handle the internal while you compile the source code. UBS will not override any permission set by the operating system, it is preferred for security reasons.
+UBT is written in [Rust](https://www.rust-lang.org/), so it gives us more advantage on the operating system. One source code will be used across all different operating system, Rust will handle the internal while you compile the source code. UBT will not override any permission set by the operating system, it is preferred for security reasons.
 
-UBT has a number of built-in tasks which will can be used in the build file to simply all the tasks. Please refer to the Tutorial or Reference to explore all the availbel build-in tasks. UBS can be used in any number of ways depending on the project requirement. There are few limitations known as we develop, but will be removed in the future releases.
+UBT has a number of built-in tasks which will can be used in the build file to simply all the tasks. Please refer to the Tutorial or Reference to explore all the availbel build-in tasks. UBT can be used in any number of ways depending on the project requirement. There are few limitations known as we develop, but will be removed in the future releases.
 
 ## When to use?
-The main known usage of UBS can be,
+The main known usage of UBT can be,
  - Automation Build
  - Production Deployment
  - Execute commands

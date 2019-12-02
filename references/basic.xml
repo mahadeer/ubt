@@ -1,9 +1,9 @@
-<project default="run" basedir="ubs">
+<project default="run">
     <loadproperty file="../properties.xml" />
     <target name="run">
         <property name="authorfile" value="sample"/>
         <property name="license_text" type="file" value="../build.txt" />
-        <echo>Hello World by UBS Tools by ${authorname}</echo>
+        <echo>Hello World by UBT Tools by ${authorname}</echo>
         <perform operation="create" path="bin/${authorname}" />
         <perform operation="create" path="del/texts" />
         <perform operation="create" type="file" path="del/texts/sample.txt">

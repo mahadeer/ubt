@@ -1,11 +1,11 @@
-<project default="run" basedir="E:\Rust\ubs\references\">
+<project default="run" basedir="E:\Rust\ubt\references\">
     <loadproperty file="properties.xml" />
     <property name="browser" value="C:/Program Files/Internet Explorer/iexplore.exe"/>
     <property name="file" value="https://www.rust-lang.org/"/>
     <property name="chrome" value="C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"/>
     <target name="run">
         <exec cmd="echo">
-            <arg value="Hello World by UBS" />
+            <arg value="Hello World by UBT" />
         </exec>
         <exec executable="${chrome}" />
         <exec executable="${browser}">
