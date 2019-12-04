@@ -1,7 +1,23 @@
 <project default="run" basedir="E:\Rust\ubt\references\">
+    <block name="introBlock">
+        <echo>Blocks can be created anywhere and it is scoped to its parents and can be called using if or exec elements</echo>
+    </block>
+    <loadproperty file="propertySheet.xml" />
     <target name="run">
-        
+        <condition property="isValid" type="and">
+            <operation type="gte" arg1="30" arg2="${age}" />
+            <operation type="in" arg1="0.2" arg2="${supportedVersions}" />
+            <operation type="eqS" arg1="mahadeer" arg2="${authorname}" />
+        </condition>
+        <echo>Condition Result: ${isValid}</echo>
+        <if value="isValid" on-true="onTrueBlock" on-false="onFalseBlock" />
     </target>
     <blocks>
+        <block name="onTrueBlock">
+            <echo> Echo from onTrueBlock</echo>
+        </block>
+        <block name="onFalseBlock">
+            <echo> Echo from onFalseBlock</echo>
+        </block>
     </blocks>
 </project>

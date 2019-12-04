@@ -33,8 +33,8 @@ pub fn create_task<'a, 'b>(
             // for strings
             "eqS" => arg1 == arg2,
             "neqS" => arg1 != arg2,
-            "in" => arg1.contains(&arg2),
-            "not in" => !arg1.contains(&arg2),
+            "in" => arg2.contains(&arg1),
+            "not in" => !arg2.contains(&arg1),
             _ => false,
         };
         results.push(result);

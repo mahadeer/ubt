@@ -1,4 +1,6 @@
 <properties>
     <property name="authorname" value="mahadeer"/>
     <property name="lastname" value="mohamed"/>
+    <property name="age" value="29" />
+    <property name="supportedVersions" value="0.1,0.2,0.3" />
 </properties>
