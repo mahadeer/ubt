@@ -5,12 +5,11 @@ const folders = ["reference"];
 
 folders.forEach(function (currentFolder) {
     const destination = path.join(__dirname, "../", currentFolder);
-    let templateStr = fs.readFileSync(path.join(__dirname, currentFolder, 'template.txt')).toString();
-
     const directoryPath = path.join(__dirname, currentFolder);
     const files = fs.readdirSync(directoryPath);
     files.forEach(function (file) {
         if (file.indexOf(".json") > -1) {
+            let templateStr = fs.readFileSync(path.join(__dirname, currentFolder, 'template.txt')).toString();
             const fileConfig = require(path.join(__dirname, currentFolder, file));
             Object.keys(fileConfig).forEach(function (key) {
                 const regex = new RegExp(`{${key}}`, "g");
