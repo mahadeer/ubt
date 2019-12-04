@@ -1,5 +1,4 @@
 <project default="run" basedir="E:\Rust\ubt\references\">
-    <loadproperty file="properties.xml" />
     <property name="browser" value="C:/Program Files/Internet Explorer/iexplore.exe"/>
     <property name="file" value="https://www.rust-lang.org/"/>
     <property name="chrome" value="C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"/>
@@ -11,5 +10,13 @@
         <exec executable="${browser}">
             <arg value="${file}" />
         </exec>
+        <exec block="someRandomBlock">
+            <property name="arg1" value="some-value" />
+        </exec>
     </target>
+    <blocks>
+        <block name="someRandomBlock">
+            <echo>The arguments are ${arg1}</echo>
+        </block>
+    </blocks>
 </project>

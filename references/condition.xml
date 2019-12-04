@@ -1,0 +1,7 @@
+<project default="run" basedir="E:\Rust\ubt\references\">
+    <target name="run">
+        
+    </target>
+    <blocks>
+    </blocks>
+</project>
