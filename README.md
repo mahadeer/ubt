@@ -2,7 +2,7 @@
 
 > **Please refer to [Docs](https://mahadeer.github.io/ubt/) here.**
 
-> *Documentation for v0.1*
+> *Documentation for v0.2*
 
 ## Getting Started
 UBT is a command-line tool used to run pre-defined tasks. These tasks can multiple dependent tasks which will also be executed. UBT tool requires a valid XML configuration in UBT required format. 
