@@ -23,7 +23,7 @@ pub fn build_project(&project: &Node, log: &logger::Logger) {
             "__project__basedir".to_owned(),
             project.attribute("basedir").unwrap_or("").to_owned(),
         );
-        utils::get_properties(&project, &mut properties, log);
+        utils::get_properties(&project, &mut properties, log); // Global properties are assigned before target run
         let mut blocks: HashMap<String, Node> = HashMap::new();
         // Get blocks from the Blocks node
         let blocks_node: Vec<Node> = project
@@ -90,6 +90,7 @@ fn resolve_target(
                 let block_name = block.attribute("name").expect("blocks must have a name");
                 scoped_blocks.insert(format!("{}", block_name), block);
             });
+        println!("{}:", target.attribute("name").unwrap());
         build_target(&target, &mut properties.clone(), &mut scoped_blocks, log);
     }
 }
@@ -100,11 +101,13 @@ fn build_target(
     blocks: &mut HashMap<String, Node>,
     log: &logger::Logger,
 ) {
-    println!("{}:", target.attribute("name").unwrap());
-    utils::get_properties(&target, properties, log);
+    // utils::get_properties(&target, properties, log);
     let elements: Vec<Node> = target.children().filter(|n| n.is_element()).collect();
     for element in elements {
         match element.tag_name().name() {
+            "property" => {
+                utils::get_property(&element, properties, log);
+            }
             "echo" => {
                 let message = utils::get_text(element.text().unwrap_or(""), &properties);
                 if element.has_attribute("file") {
@@ -170,6 +173,9 @@ fn build_target(
                     log.build_failed("if condition is not valid".to_owned());
                 }
             }
+            "each" => {
+                tasks::each::create_task(&element, &log, properties, blocks, &build_target);
+            }
             "exec" => {
                 tasks::exec::create_task(&element, &log, properties);
                 if element.has_attribute("block") {
@@ -177,6 +183,9 @@ fn build_target(
                     let block = blocks.get(block_name).unwrap();
                     build_target(&block, &mut properties.clone(), &mut blocks.clone(), &log);
                 }
+            }
+            "string-builder" => {
+                tasks::string_builder::create_task(&element, &log, properties)
             }
             _ => {}
         }

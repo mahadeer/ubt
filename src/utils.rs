@@ -1,11 +1,11 @@
 use crate::logger;
 use regex::Regex;
 use roxmltree::Document;
+use roxmltree::Node;
 use std::collections::HashMap;
 use std::fs;
 use std::io::prelude::*;
 use std::path::PathBuf;
-use roxmltree::Node;
 
 pub fn get_text(text: &str, properties_hash: &HashMap<String, String>) -> String {
     let rex = Regex::new(r"\$[a-zA-Z0-9\{\}_]*").unwrap();
@@ -104,4 +104,36 @@ pub fn get_properties(
             }
         }
     }
+}
+
+pub fn get_property(
+    &property: &Node,
+    properties_hash: &mut HashMap<String, String>,
+    log: &logger::Logger,
+) {
+    match property.attribute("type").unwrap_or("") {
+        "file" => {
+            let filename = property.attribute("value").unwrap_or("");
+            let file_path =
+                std::path::Path::new(properties_hash.get("__project__basedir").unwrap())
+                    .join(filename.clone());
+            let contents = match std::fs::read_to_string(file_path) {
+                Ok(f) => f,
+                Err(_e) => {
+                    log.build_failed(format!("{} not found", filename));
+                    std::process::exit(0);
+                }
+            };
+            properties_hash.insert(
+                String::from(property.attribute("name").unwrap_or("")),
+                contents,
+            );
+        }
+        _ => {
+            properties_hash.insert(
+                String::from(property.attribute("name").unwrap_or("")),
+                String::from(property.attribute("value").unwrap_or("")),
+            );
+        }
+    };
 }
