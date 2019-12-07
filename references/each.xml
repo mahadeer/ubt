@@ -1,0 +1,13 @@
+<project default="dev">
+    <target name="dev">
+        <echo>For Loops reference</echo>
+        <each list="hELLo; wORLd" delimiter=";" as="name" on-loop="LoopBody" />
+    </target>
+    <blocks>
+        <block name="LoopBody">
+            <string-builder type="trim" name="name" value="${name}" />
+            <string-builder type="toUpperCase" name="name" value="${name}" />
+            <echo>${name}.</echo>
+        </block>
+    </blocks>
+</project>
