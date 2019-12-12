@@ -1,0 +1,58 @@
+---
+name: File IO
+menu: Tutorials
+route: /file-io
+---
+
+### Creating a file/folder
+```xml
+<project default="run" basedir="C:\somfolder\">
+    <target name="run">
+        <property name="authorName" value="YourName"/>
+        <property name="license_text" type="file" value="license.txt" />
+        <echo>Creating a new File</echo>
+        <perform operation="create" path="${authorname}" />
+        <perform operation="create" type="file" path="message.txt">
+            This content will be inside the created file, we can use ${authorName} property also. 
+        </perform>
+        <perform operation="create" type="file" path="${authorname}/${authorfile}.txt">
+            Written by the ${authorname}.
+            ${license_text}
+        </perform>
+    </target>
+</project>
+```
+#### Notes
+1. **perfrom** tag without **type** attribute will be considered as creating a directory.
+2. **perform** tag of **type** file will use the childeren text to write inside a file. **property** name can be used inside the text nodes.
+
+### Delete/Copy/Move on a file/folder
+```xml
+<project default="run" basedir="C:\somfolder\">
+    <target name="run">
+        <property name="authorName" value="YourName"/>
+        <echo>Deletes a directory</echo>
+        <perform type="delete" path="${authorname}" />
+        <echo>Deletes every file inside the folder dist, excepts anything has an extension .ini</echo>
+        <perform operation="delete" type="fileset" path="dist">
+            <fileset type="excludes" path="**/texts/*.ini" />
+        </perform>
+        <echo>Move a directory on from and paste it inside to</echo>
+        <perform operation="move" from="src/${authorname}" to="dir2" />
+        <echo>Copy a directory on from and paste it inside to</echo>
+        <perform operation="copy" from="dir1" to="${authorname}/bin/" />
+        <echo>Copy a file between from and to</echo>
+        <perform operation="copy" type="file" from="sample2/${authorname}/${authorfile}.txt" to="sample1/${authorfile}.txt" />
+    </target>
+</project>
+```
+#### Notes
+For more reference please read the section on the Related section.
+
+### Related
+- [project] (https://mahadeer.github.io/ubt/project)
+- [target] (https://mahadeer.github.io/ubt/target)
+- [perform] (https://mahadeer.github.io/ubt/perform)
+- [property] (https://mahadeer.github.io/ubt/property)
+- [fileset] (https://mahadeer.github.io/ubt/fileset)
+- [echo] (https://mahadeer.github.io/ubt/echo)
