@@ -40,19 +40,21 @@ export const ContentLayout = (props) => {
             <h3>Syntax</h3>
             <div className="example-code"><XMLViewer xml={props.syntax} theme={xmlCustomTheme}></XMLViewer></div>
         </div>
-        <div className="examples">
-            <h3>Examples</h3>
-            {
-                examples.map((example, idx) => (
-                    <div className="example" key={idx}>
-                        <p>{example.description}</p>
-                        <div className="example-code"><XMLViewer xml={example.content} theme={xmlCustomTheme}></XMLViewer></div>
-                        {example.note !== "" ? <p className="example-note">Note: {example.note}</p> : null}
-                        {idx !== examples.length - 1 ? <hr /> : null}
-                    </div>
-                ))
-            }
-        </div>
+        {examples.length > 0 ?
+            <div className="examples">
+                <h3>Examples</h3>
+                {
+                    examples.map((example, idx) => (
+                        <div className="example" key={idx}>
+                            <p>{example.description}</p>
+                            <div className="example-code"><XMLViewer xml={example.content} theme={xmlCustomTheme}></XMLViewer></div>
+                            {example.note !== "" ? <p className="example-note">Note: {example.note}</p> : null}
+                            {idx !== examples.length - 1 ? <hr /> : null}
+                        </div>
+                    ))
+                }
+            </div> : null
+        }
         {requires.length > 0 ?
             <div className="requires">
                 <h3>Requires</h3>
