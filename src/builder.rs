@@ -72,7 +72,7 @@ fn resolve_target(
             for dependency in dependencies {
                 let dependency_targets: Vec<Node> = project
                     .children()
-                    .filter(|n| n.is_element() && n.attribute("name").unwrap_or("") == dependency)
+                    .filter(|n| n.is_element() && n.attribute("name").unwrap_or("") == dependency.trim())
                     .collect();
                 resolve_target(
                     &project,

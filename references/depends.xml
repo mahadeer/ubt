@@ -1,0 +1,14 @@
+<project default="dev">
+    <target name="dev" depends="concepts, background">
+        <echo>Coming to the dev target</echo>
+    </target>
+    <target name="concepts" depends="concept101">
+        <echo>Exploring the concepts</echo>
+    </target>
+    <target name="concept101">
+        <echo>Exploring the concept 101</echo>
+    </target>
+    <target name="background">
+        <echo>Exploring the background</echo>
+    </target>
+</project>
