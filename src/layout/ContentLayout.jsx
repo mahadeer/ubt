@@ -13,29 +13,32 @@ export const ContentLayout = (props) => {
     return (<div id="content">
         <h1>{props['title']}</h1>
         <p dangerouslySetInnerHTML={{ __html: props.description }}></p>
-        <div className="properties">
-            <h3>Properties</h3>
-            <table className="">
-                <tbody>
-                    <tr className="thead uk-background-secondary">
-                        <th>Attribute</th>
-                        <th>Description</th>
-                        <th>Options</th>
-                        <th>Required</th>
-                    </tr>
-                    {
-                        properties.map(prop => (
-                            <tr key={prop.key}>
-                                <td>{prop.key}</td>
-                                <td dangerouslySetInnerHTML={{ __html: prop.description }}></td>
-                                <td>{prop.possibleValues}<br />Default is {prop.default}</td>
-                                <td>{prop.required}</td>
-                            </tr>
-                        ))
-                    }
-                </tbody>
-            </table>
-        </div>
+        {properties.length > 0 ?
+            <div className="properties">
+                <h3>Properties</h3>
+                <table className="">
+                    <tbody>
+                        <tr className="thead uk-background-secondary">
+                            <th>Attribute</th>
+                            <th>Description</th>
+                            <th>Options</th>
+                            <th>Required</th>
+                        </tr>
+                        {
+                            properties.map(prop => (
+                                <tr key={prop.key}>
+                                    <td>{prop.key}</td>
+                                    <td dangerouslySetInnerHTML={{ __html: prop.description }}></td>
+                                    <td>{prop.possibleValues}<br />Default is {prop.default}</td>
+                                    <td>{prop.required}</td>
+                                </tr>
+                            ))
+                        }
+                    </tbody>
+                </table>
+            </div>
+            : null
+        }
         <div className="syntax">
             <h3>Syntax</h3>
             <div className="example-code"><XMLViewer xml={props.syntax} theme={xmlCustomTheme}></XMLViewer></div>

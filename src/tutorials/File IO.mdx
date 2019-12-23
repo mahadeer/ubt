@@ -8,7 +8,7 @@ route: /file-io
 ```xml
 <project default="run" basedir="C:\somfolder\">
     <target name="run">
-        <property name="authorName" value="YourName"/>
+        <property name="authorname" value="YourName"/>
         <property name="license_text" type="file" value="license.txt" />
         <echo>Creating a new File</echo>
         <perform operation="create" path="${authorname}" />
@@ -30,7 +30,7 @@ route: /file-io
 ```xml
 <project default="run" basedir="C:\somfolder\">
     <target name="run">
-        <property name="authorName" value="YourName"/>
+        <property name="authorname" value="YourName"/>
         <echo>Deletes a directory</echo>
         <perform type="delete" path="${authorname}" />
         <echo>Deletes every file inside the folder dist, excepts anything has an extension .ini</echo>
