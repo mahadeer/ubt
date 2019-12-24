@@ -7,7 +7,7 @@
         <block name="LoopBody">
             <string-builder type="trim" name="name" value="${name}" />
             <string-builder type="toUpperCase" name="name" value="${name}" />
-            <echo>${name}.</echo>
+            <echo>${LoopBody_index}. ${name}</echo>
         </block>
     </blocks>
 </project>

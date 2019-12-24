@@ -9,7 +9,6 @@ pub fn create_task<'a, 'b>(
     /* Check for errors */
     if element.has_attribute("name")
         && element.has_attribute("value")
-        && element.has_attribute("type")
     {
         let value = utils::get_text(element.attribute("value").unwrap_or(""), &properties_hash);
         let prop_name = element.attribute("name").unwrap_or("");
@@ -17,7 +16,7 @@ pub fn create_task<'a, 'b>(
         if value == "" || prop_name == "" {
             log.build_failed("Missing name/value. Refer documentation for help".to_owned());
         } else {
-            match element.attribute("type").unwrap_or("") {
+            match element.attribute("type").unwrap_or("trim") {
                 "trim" => {
                     properties_hash.insert(prop_name.to_owned(), value.trim().to_owned());
                 }

@@ -28,16 +28,35 @@ pub fn create_task<'a, 'b>(
             );
         } else {
             let block = blocks.get(block_name).unwrap();
-            let list_values = list.split(delimiter);
-            for value in list_values {
-                properties_hash.insert(param.to_string(), value.to_string());
-                callback(
-                    &block,
-                    &mut properties_hash.clone(),
-                    &mut blocks.clone(),
-                    &log,
-                );
+            if delimiter == "\\n" {
+                let mut index = 0;
+                list.lines().for_each(|l| {
+                    properties_hash.insert(format!("{}_index", block_name), index.to_string());
+                    properties_hash.insert(param.to_string(), l.to_string());
+                    callback(
+                        &block,
+                        &mut properties_hash.clone(),
+                        &mut blocks.clone(),
+                        &log,
+                    );
+                    index = index + 1;
+                });
+            } else {
+                let list_values = list.split(delimiter);
+                let mut index = 0;
+                for value in list_values {
+                    properties_hash.insert(format!("{}_index", block_name), index.to_string());
+                    properties_hash.insert(param.to_string(), value.to_string());
+                    callback(
+                        &block,
+                        &mut properties_hash.clone(),
+                        &mut blocks.clone(),
+                        &log,
+                    );
+                    index = index + 1;
+                }
             }
+
         }
     } else {
         log.build_failed(
