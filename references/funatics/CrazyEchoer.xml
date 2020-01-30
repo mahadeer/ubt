@@ -1,0 +1,19 @@
+<project default="echoer">
+    <target name="echoer">
+        <echo>Crazy Sequence ECHOER</echo>
+        <exec cmd="@echo off && for /l %x in (1, 1, 100) do (echo %x >> numbers.txt)" />
+        <property name="numbers" type="file" value="numbers.txt" />
+        <perform operation="delete" type="file" path="numbers.txt" />
+        <perform operation="create" path="dist" />
+        <each list="${numbers}" delimiter="\n" as="index" on-loop="LoopBody" />
+    </target>
+    <blocks>
+        <block name="LoopBody">
+            <string-builder type="trim" name="index" value="${index}" />
+            <perform operation="create" path="dist/${index}" />
+            <perform operation="create" type="file" path="dist/${index}/BOT.txt">
+                This is part of the crazy sequence ECHOER ${index}
+            </perform>
+        </block>
+    </blocks>
+</project>
